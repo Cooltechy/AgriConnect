@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #2196F3;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .order-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .order-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .order-id {
+            font-size: 2rem;
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        .order-status {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            text-transform: capitalize;
+        }
+
+        .status-delivered { background: #e8f5e8; color: #2e7d32; }
+        .status-shipped { background: #fff3e0; color: #ef6c00; }
+        .status-processing { background: #e3f2fd; color: #1976d2; }
+        .status-pending { background: #fff3e0; color: #f57c00; }
+        .status-cancelled { background: #ffebee; color: #c62828; }
+
+        .order-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .meta-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .items-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .item-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: shadow 0.3s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-farmer {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .item-pricing {
+            text-align: right;
+        }
+
+        .item-price {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .item-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .item-quantity {
+            background: #f0f8ff;
+            color: #2196F3;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .address-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .address-type {
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .address-details {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .tracking-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -35px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .timeline-item.completed::before {
+            background: #4CAF50;
+        }
+
+        .timeline-item.current::before {
+            background: #2196F3;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background: #e0e0e0;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .timeline-date {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .timeline-description {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .payment-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .payment-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            border: 2px solid #2196F3;
+            color: #2196F3;
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+
+        .total-summary {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #2196F3;
+            margin-top: 15px;
+            padding-top: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2196F3;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .order-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .order-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .item-header {
+                flex-direction: column;
+            }
+            
+            .item-pricing {
+                text-align: left;
+            }
+            
+            .address-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🛒 AgriConnect - Marketplace</div>
+            <div class="nav-links">
+                <a href="/client-dashboard">Dashboard</a>
+                <a href="/search">Browse</a>
+                <a href="/orders/history">Orders</a>
+                <a href="/">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/client-dashboard">Dashboard</a> > 
+            <a href="/orders/history">Orders</a> > 
+            Order Details
+        </div>
+
+        <% if (typeof order !== 'undefined') { %>
+            <!-- Order Header -->
+            <div class="order-header">
+                <div class="order-title">
+                    <h1 class="order-id">Order #<%= order.orderNumber %></h1>
+                    <div class="order-status status-<%= order.status %>">
+                        <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+                    </div>
+                </div>
+
+                <div class="order-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Order Date</div>
+                        <div class="meta-value"><%= new Date(order.createdAt).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric'
+                        }) %></div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Total Amount</div>
+                        <div class="meta-value">₹<%= order.totalAmount.toLocaleString() %></div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Items Count</div>
+                        <div class="meta-value"><%= order.items.length %> Products</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Payment Method</div>
+                        <div class="meta-value"><%= order.paymentMethod || 'COD' %></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="section">
+                <h2 class="section-title">Order Items</h2>
+                <div class="items-list">
+                    <% order.items.forEach(item => { %>
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-info">
+                                    <div class="item-name"><%= item.product.name %></div>
+                                    <div class="item-farmer">
+                                        <% if (item.product.farmer) { %>
+                                            Sold by: <%= item.product.farmer.name || 'Local Farmer' %>
+                                        <% } else { %>
+                                            Local Farmer Product
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="item-pricing">
+                                    <div class="item-price">₹<%= item.price.toLocaleString() %> per unit</div>
+                                    <div class="item-total">₹<%= (item.quantity * item.price).toLocaleString() %></div>
+                                </div>
+                            </div>
+                            <div class="item-quantity">
+                                Quantity: <%= item.quantity %> <%= item.product.unit || 'units' %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <!-- Order Total -->
+                <div class="total-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>₹<%= order.items.reduce((sum, item) => sum + (item.quantity * item.price), 0).toLocaleString() %></span>
+                    </div>
+                    <% if (order.deliveryCharges && order.deliveryCharges > 0) { %>
+                        <div class="summary-row">
+                            <span>Delivery Charges:</span>
+                            <span>₹<%= order.deliveryCharges.toLocaleString() %></span>
+                        </div>
+                    <% } %>
+                    <% if (order.taxes && order.taxes > 0) { %>
+                        <div class="summary-row">
+                            <span>Taxes:</span>
+                            <span>₹<%= order.taxes.toLocaleString() %></span>
+                        </div>
+                    <% } %>
+                    <div class="summary-row total">
+                        <span>Total Amount:</span>
+                        <span>₹<%= order.totalAmount.toLocaleString() %></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Address -->
+            <% if (order.deliveryAddress) { %>
+                <div class="section">
+                    <h2 class="section-title">Delivery Information</h2>
+                    <div class="address-grid">
+                        <div class="address-card">
+                            <div class="address-type">Delivery Address</div>
+                            <div class="address-details">
+                                <div><strong><%= order.deliveryAddress.name || 'Customer' %></strong></div>
+                                <% if (order.deliveryAddress.phone) { %>
+                                    <div>Phone: <%= order.deliveryAddress.phone %></div>
+                                <% } %>
+                                <div><%= order.deliveryAddress.street %></div>
+                                <div><%= order.deliveryAddress.city %>, <%= order.deliveryAddress.state %></div>
+                                <div>PIN: <%= order.deliveryAddress.pincode %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Order Tracking -->
+            <div class="section">
+                <h2 class="section-title">Order Tracking</h2>
+                <div class="tracking-timeline">
+                    <div class="timeline-item completed">
+                        <div class="timeline-content">
+                            <div class="timeline-title">Order Placed</div>
+                            <div class="timeline-date"><%= new Date(order.createdAt).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) %></div>
+                            <div class="timeline-description">Your order has been placed successfully</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item <%= order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered' ? 'completed' : '' %> <%= order.status === 'processing' ? 'current' : '' %>">
+                        <div class="timeline-content">
+                            <div class="timeline-title">Order Processing</div>
+                            <% if (order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered') { %>
+                                <div class="timeline-date">Being processed</div>
+                                <div class="timeline-description">Your order is being prepared by the farmer</div>
+                            <% } else { %>
+                                <div class="timeline-description">Waiting for farmer confirmation</div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item <%= order.status === 'shipped' || order.status === 'delivered' ? 'completed' : '' %> <%= order.status === 'shipped' ? 'current' : '' %>">
+                        <div class="timeline-content">
+                            <div class="timeline-title">Order Shipped</div>
+                            <% if (order.status === 'shipped' || order.status === 'delivered') { %>
+                                <div class="timeline-date">In transit</div>
+                                <div class="timeline-description">Your order is on the way</div>
+                            <% } else { %>
+                                <div class="timeline-description">Preparing for shipment</div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item <%= order.status === 'delivered' ? 'completed current' : '' %>">
+                        <div class="timeline-content">
+                            <div class="timeline-title">Order Delivered</div>
+                            <% if (order.status === 'delivered') { %>
+                                <div class="timeline-date">Delivered successfully</div>
+                                <div class="timeline-description">Your order has been delivered</div>
+                            <% } else { %>
+                                <div class="timeline-description">Pending delivery</div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Actions -->
+            <div class="order-actions">
+                <a href="/orders/history" class="btn btn-outline">← Back to Orders</a>
+                
+                <% if (order.status === 'pending' || order.status === 'processing') { %>
+                    <button onclick="cancelOrder('<%= order._id %>')" class="btn btn-danger">Cancel Order</button>
+                <% } %>
+                
+                <% if (order.status === 'delivered') { %>
+                    <a href="/orders/<%= order._id %>/review" class="btn btn-primary">Write Review</a>
+                <% } %>
+                
+                <button onclick="window.print()" class="btn btn-outline">Print Order</button>
+            </div>
+
+        <% } else { %>
+            <div class="section">
+                <h2>Order Not Found</h2>
+                <p>The order you're looking for doesn't exist or you don't have permission to view it.</p>
+                <a href="/orders/history" class="btn btn-primary">← Back to Orders</a>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                fetch(`/orders/${orderId}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order cancelled successfully!');
+                        location.reload();
+                    } else {
+                        alert('Failed to cancel order: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cancelling order:', error);
+                    alert('Error cancelling order. Please try again.');
+                });
+            }
+        }
+
+        // Print styles
+        window.addEventListener('beforeprint', function() {
+            document.body.style.background = 'white';
+            document.querySelectorAll('.navbar, .order-actions').forEach(el => {
+                el.style.display = 'none';
+            });
+        });
+
+        window.addEventListener('afterprint', function() {
+            document.body.style.background = '';
+            document.querySelectorAll('.navbar, .order-actions').forEach(el => {
+                el.style.display = '';
+            });
+        });
+    </script>
+</body>
+</html>

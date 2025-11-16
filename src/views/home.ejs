@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriConnect - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            /* min-height: 100vh; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            padding: 60px 40px;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .content {
+            padding: 50px 40px;
+        }
+
+        .description {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .feature {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 18px 35px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #757575, #424242);
+            box-shadow: 0 4px 15px rgba(117, 117, 117, 0.3);
+        }
+
+        .btn.secondary:hover {
+            box-shadow: 0 6px 20px rgba(117, 117, 117, 0.4);
+        }
+
+        .footer {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="emoji">🌾</span>
+            <h1>AgriConnect</h1>
+            <p class="subtitle">Bridging the gap between farmers and buyers</p>
+        </div>
+
+        <div class="content">
+            <p class="description">
+                Welcome to AgriConnect - the premier platform connecting farmers directly with clients 
+                in a seamless agricultural marketplace. Join thousands of users already growing their business with us.
+            </p>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🚜</div>
+                    <h3>For Farmers</h3>
+                    <p>Sell your fresh produce directly to buyers and get better prices for your crops</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🏢</div>
+                    <h3>For Clients</h3>
+                    <p>Source fresh, quality products directly from trusted local farmers</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🤝</div>
+                    <h3>Direct Connection</h3>
+                    <p>Skip the middleman and build lasting relationships in the agricultural community</p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/register" class="btn">🌱 Join Now</a>
+                <a href="/login" class="btn secondary">🔑 Login</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 AgriConnect. Connecting agriculture communities worldwide.</p>
+        </div>
+    </div>
+</body>
+</html>

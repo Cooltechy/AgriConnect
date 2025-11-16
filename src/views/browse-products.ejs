@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Products - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #2196F3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .filters {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-category {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            text-transform: capitalize;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+
+        .product-details {
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            color: #666;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .farmer-info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .farmer-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .farmer-contact {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+
+        .btn-outline {
+            border: 2px solid #2196F3;
+            color: #2196F3;
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        .organic-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🌾 AgriConnect - Marketplace</div>
+            <div class="nav-links">
+                <a href="/client-dashboard">Dashboard</a>
+                <a href="/products">Browse</a>
+                <a href="/orders/history">Orders</a>
+                <a href="/">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Browse Fresh Products</h1>
+            <p>Discover quality produce directly from local farmers</p>
+        </div>
+
+        <div class="filters">
+            <form method="GET" action="/products">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="all">All Categories</option>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat %>" <%= filters.category === cat ? 'selected' : '' %>>
+                                    <%= cat.charAt(0).toUpperCase() + cat.slice(1) %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" placeholder="Enter city or state"
+                               value="<%= filters.location || '' %>">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="minPrice">Min Price (₹)</label>
+                        <input type="number" id="minPrice" name="minPrice" placeholder="0"
+                               value="<%= filters.minPrice || '' %>">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="maxPrice">Max Price (₹)</label>
+                        <input type="number" id="maxPrice" name="maxPrice" placeholder="1000"
+                               value="<%= filters.maxPrice || '' %>">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="organic" value="true" <%= filters.organic === 'true' ? 'checked' : '' %>>
+                        Organic Products Only
+                    </label>
+                    <button type="submit" class="btn btn-primary" style="flex: none; padding: 10px 25px;">
+                        🔍 Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="products-grid">
+            <% if (products && products.length > 0) { %>
+                <% products.forEach(product => { %>
+                    <div class="product-card" style="position: relative;">
+                        <% if (product.isOrganic) { %>
+                            <div class="organic-badge">🌿 ORGANIC</div>
+                        <% } %>
+
+                        <div class="product-header">
+                            <div>
+                                <div class="product-name"><%= product.name %></div>
+                                <div class="product-category"><%= product.category %></div>
+                            </div>
+                        </div>
+
+                        <div class="product-price">₹<%= product.price.toLocaleString() %>/<%= product.unit %></div>
+
+                        <div class="product-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Available:</span>
+                                <span class="detail-value"><%= product.quantity %> <%= product.unit %></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location:</span>
+                                <span class="detail-value"><%= product.location %></span>
+                            </div>
+                            <% if (product.harvestDate) { %>
+                                <div class="detail-row">
+                                    <span class="detail-label">Harvested:</span>
+                                    <span class="detail-value"><%= new Date(product.harvestDate).toLocaleDateString() %></span>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <div class="product-description">
+                            <%= product.description.length > 100 ? 
+                                product.description.substring(0, 100) + '...' : 
+                                product.description %>
+                        </div>
+
+                        <div class="farmer-info">
+                            <div class="farmer-name">👨‍🌾 <%= product.farmerName %></div>
+                            <div class="farmer-contact">📞 <%= product.farmerContact %></div>
+                        </div>
+
+                        <div class="product-actions">
+                            <a href="tel:<%= product.farmerContact %>" class="btn btn-outline">📞 Call</a>
+                            <button onclick="orderProduct('<%= product._id %>')" class="btn btn-primary">🛒 Order</button>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="no-products">
+                    <h3>No products found</h3>
+                    <p>Try adjusting your filters or search criteria</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        function orderProduct(productId) {
+            // In a real app, this would open an order form
+            alert('Order functionality coming soon! Please call the farmer directly for now.');
+        }
+    </script>
+</body>
+</html>

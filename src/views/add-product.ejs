@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 Add New Product</h1>
+            <p>Add your Product </p>
+        </div>
+
+        <div class="form-container">
+            <% if (typeof error !== 'undefined') { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+
+            <form action="/add-product" method="POST">
+                <input type="hidden" name="farmerId" value="<%= farmerId %>">
+                
+                <div class="form-group">
+                    <label for="name">Product Name *</label>
+                    <input type="text" id="name" name="name" required 
+                           value="<%= typeof formData !== 'undefined' ? formData.name || '' : '' %>">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="fruits">Fruits</option>
+                            <option value="vegetables">Vegetables</option>
+                            <option value="grains">Grains</option>
+                            <option value="dairy">Dairy</option>
+                            <option value="meat">Meat</option>
+                            <option value="herbs">Herbs</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unit">Unit *</label>
+                        <select id="unit" name="unit" required>
+                            <option value="">Select Unit</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="gram">Gram</option>
+                            <option value="liter">Liter</option>
+                            <option value="piece">Piece</option>
+                            <option value="dozen">Dozen</option>
+                            <option value="quintal">Quintal</option>
+                            <option value="ton">Ton</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description *</label>
+                    <textarea id="description" name="description" required 
+                              placeholder="Describe your product quality, farming methods, etc."><%= typeof formData !== 'undefined' ? formData.description || '' : '' %></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price per Unit (₹) *</label>
+                        <input type="number" id="price" name="price" step="0.01" min="0" required
+                               value="<%= typeof formData !== 'undefined' ? formData.price || '' : '' %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Available Quantity *</label>
+                        <input type="number" id="quantity" name="quantity" min="1" required
+                               value="<%= typeof formData !== 'undefined' ? formData.quantity || '' : '' %>">
+                    </div>
+                </div>
+
+
+                
+
+                <button type="submit" class="btn">🌟 Add Product</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

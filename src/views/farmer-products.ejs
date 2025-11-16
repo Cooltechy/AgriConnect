@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Products - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            margin-left: 10px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            text-align: center;
+        }
+
+        .stat {
+            background: #f1f8e9;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2E7D32;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .add-product-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .add-product-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 5px;
+        }
+
+        .product-category {
+            background: #e8f5e8;
+            color: #2E7D32;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            text-transform: capitalize;
+        }
+
+        .product-price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .product-details {
+            margin: 15px 0;
+        }
+
+        .product-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .product-description {
+            color: #666;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .btn-toggle {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-toggle.disabled {
+            background: #757575;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #e8f5e8;
+            color: #2E7D32;
+        }
+
+        .status-unavailable {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .organic-badge {
+            background: #2E7D32;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            margin-left: 10px;
+        }
+
+        .no-products {
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .no-products-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header-stats {
+                justify-content: center;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🌾 AgriConnect - My Products</div>
+            <div class="nav-links">
+                <a href="/farmer-dashboard">Dashboard</a>
+                <a href="/add-product<%= farmer ? '?userId=' + farmer._id : '' %>">Add Product</a>
+                <a href="/">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1>My Products</h1>
+                <p>Manage your listed products and track sales</p>
+            </div>
+            
+            <div class="header-stats">
+                <div class="stat">
+                    <div class="stat-number"><%= products.length %></div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number"><%= products.filter(p => p.isAvailable).length %></div>
+                    <div class="stat-label">Available</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px; text-align: center;">
+            <a href="/add-product<%= farmer ? '?userId=' + farmer._id : '' %>" class="add-product-btn">+ Add New Product</a>
+        </div>
+
+        <% if (products.length === 0) { %>
+            <div class="no-products">
+                <div class="no-products-icon">📦</div>
+                <h2>No Products Listed Yet</h2>
+                <p>Start by adding your first product to the marketplace</p>
+                <br>
+                <a href="/add-product<%= farmer ? '?userId=' + farmer._id : '' %>" class="add-product-btn">Add Your First Product</a>
+            </div>
+        <% } else { %>
+            <div class="products-grid">
+                <% products.forEach(product => { %>
+                    <div class="product-card">
+                        <div class="product-header">
+                            <div>
+                                <div class="product-name">
+                                    <%= product.name %>
+                                    <% if (product.isOrganic) { %>
+                                        <span class="organic-badge">🌱 Organic</span>
+                                    <% } %>
+                                </div>
+                                <span class="product-category"><%= product.category %></span>
+                            </div>
+                            <div class="product-price">₹<%= product.price %>/<%= product.unit %></div>
+                        </div>
+
+                        <div class="product-description"><%= product.description %></div>
+
+                        <div class="product-details">
+                            <div class="product-detail">
+                                <span>Quantity:</span>
+                                <span><%= product.quantity %> <%= product.unit %></span>
+                            </div>
+                            <div class="product-detail">
+                                <span>Added:</span>
+                                <span><%= new Date(product.createdAt).toLocaleDateString() %></span>
+                            </div>
+                            <div class="product-detail">
+                                <span>Status:</span>
+                                <span class="status-badge <%= product.isAvailable ? 'status-available' : 'status-unavailable' %>">
+                                    <%= product.isAvailable ? 'Available' : 'Unavailable' %>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <button class="btn btn-toggle <%= !product.isAvailable ? 'disabled' : '' %>"
+                                    onclick="toggleProduct('<%= product._id %>', '<%= product.isAvailable %>')">
+                                <%= product.isAvailable ? 'Disable' : 'Enable' %>
+                            </button>
+                            <button class="btn btn-delete" onclick="deleteProduct('<%= product._id %>')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        async function toggleProduct(productId, isAvailable) {
+            try {
+                const response = await fetch(`/products/${productId}/toggle`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert(result.message || 'Failed to update product');
+                }
+            } catch (error) {
+                alert('Error updating product');
+            }
+        }
+
+        async function deleteProduct(productId) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                try {
+                    const response = await fetch(`/products/${productId}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert(result.message || 'Failed to delete product');
+                    }
+                } catch (error) {
+                    alert('Error deleting product');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

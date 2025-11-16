@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Added - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            padding: 50px 40px;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 2.5em;
+            color: #2E7D32;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .product-info {
+            background-color: #f1f8e9;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4CAF50;
+            text-align: left;
+        }
+
+        .product-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .product-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #2E7D32;
+        }
+
+        .detail-value {
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #757575, #424242);
+        }
+
+        .organic-badge {
+            display: inline-block;
+            background: #2E7D32;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        <h1 class="success-title">Product Added Successfully!</h1>
+        <p class="success-message"><%= message %></p>
+        
+        <div class="product-info">
+            <h3 style="color: #2E7D32; margin-bottom: 15px;">Product Details:</h3>
+            
+            <div class="product-detail">
+                <span class="detail-label">Name:</span>
+                <span class="detail-value">
+                    <%= product.name %>
+                    <% if (product.isOrganic) { %>
+                        <span class="organic-badge">🌱 Organic</span>
+                    <% } %>
+                </span>
+            </div>
+            
+            <div class="product-detail">
+                <span class="detail-label">Category:</span>
+                <span class="detail-value"><%= product.category.charAt(0).toUpperCase() + product.category.slice(1) %></span>
+            </div>
+            
+            <div class="product-detail">
+                <span class="detail-label">Price:</span>
+                <span class="detail-value">₹<%= product.price %> per <%= product.unit %></span>
+            </div>
+            
+            <div class="product-detail">
+                <span class="detail-label">Quantity:</span>
+                <span class="detail-value"><%= product.quantity %> <%= product.unit %></span>
+            </div>
+            
+            <div class="product-detail">
+
+            </div>
+            
+            <div class="product-detail">
+                <span class="detail-label">Added on:</span>
+                <span class="detail-value"><%= new Date(product.createdAt).toLocaleDateString() %></span>
+            </div>
+        </div>
+
+        <div>
+            <a href="/add-product?userId=<%= product.farmerId %>" class="btn">Add Another Product</a>
+            <a href="/farmer/<%= product.farmerId %>/products" class="btn btn-secondary">View My Products</a>
+        </div>
+    </div>
+</body>
+</html>

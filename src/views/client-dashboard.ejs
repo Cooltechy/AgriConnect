@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1976D2, #2196F3);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            margin-left: 10px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .search-header h1 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            display: flex;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suggestion-item:hover {
+            background: #f5f5f5;
+        }
+
+        .suggestion-type {
+            font-size: 0.8em;
+            color: #666;
+            background: #e3f2fd;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Quick Categories */
+        .quick-categories {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-chip {
+            padding: 8px 16px;
+            background: #e3f2fd;
+            color: #1976D2;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .category-chip:hover {
+            background: #1976D2;
+            color: white;
+        }
+
+        /* Featured Products Section */
+        .featured-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #1976D2;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e3f2fd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .view-all-link {
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            border-left: 4px solid #2196F3;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 5px;
+        }
+
+        .product-category {
+            background: #e3f2fd;
+            color: #1976D2;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            text-transform: capitalize;
+        }
+
+        .product-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .product-farmer {
+            color: #666;
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+
+
+
+        .organic-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            margin-left: 8px;
+        }
+
+        .contact-farmer-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .contact-farmer-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Categories Section */
+        .categories-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .category-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .category-card:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+            transform: translateY(-3px);
+        }
+
+        .category-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .category-name {
+            font-weight: bold;
+            color: #1976D2;
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+            
+            .search-btn {
+                border-radius: 0 0 15px 15px;
+            }
+            
+            .quick-categories {
+                justify-content: flex-start;
+            }
+        }
+
+        /* Order Status Styles */
+        .status-delivered {
+            background: #e8f5e8 !important;
+            color: #2e7d32 !important;
+        }
+
+        .status-shipped {
+            background: #fff3e0 !important;
+            color: #ef6c00 !important;
+        }
+
+        .status-processing {
+            background: #e3f2fd !important;
+            color: #1976d2 !important;
+        }
+
+        .status-pending {
+            background: #fff3e0 !important;
+            color: #f57c00 !important;
+        }
+
+        .status-cancelled {
+            background: #ffebee !important;
+            color: #c62828 !important;
+        }
+
+        .btn-outline:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🛒 AgriConnect - Marketplace</div>
+            <div class="nav-links">
+                <a href="/search">Home</a>
+                <a href="/client-dashboard">Dashboard</a>
+                <span style="color: rgba(255,255,255,0.8); margin: 0 10px;">|</span>
+                <span style="color: rgba(255,255,255,0.9); padding: 8px 12px;">
+                    👤 <%= user.name || 'User' %>
+                </span>
+                <a href="/">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- User Profile Section -->
+        <div class="user-profile-section" style="background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                <div class="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #2196F3, #1976D2); display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; font-weight: bold;">
+                    <%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %>
+                </div>
+                <div class="profile-info">
+                    <h1 style="color: #1976D2; margin-bottom: 8px; font-size: 2.2em;">
+                        Welcome, <%= user.name || 'User' %>! 👋
+                    </h1>
+                    <p style="color: #666; font-size: 1.1em; margin-bottom: 5px;">Client Dashboard - Manage your orders and shop fresh products</p>
+                    <div style="display: flex; align-items: center; gap: 15px; color: #888; font-size: 0.9em;">
+                        <span>📧 <%= user.email || 'N/A' %></span>
+                        <span>📱 <%= user.contact || 'N/A' %></span>
+                        <span style="background: #E3F2FD; color: #1976D2; padding: 4px 12px; border-radius: 20px; font-weight: 500;">
+                            <%= user.userType ? user.userType.charAt(0).toUpperCase() + user.userType.slice(1) : 'Client' %>
+                        </span>
+                    </div>
+                </div>
+                <div class="profile-actions" style="margin-left: auto;">
+                    <a href="/search?userId=<%= user._id %>" style="background: linear-gradient(135deg, #4CAF50, #388E3C); color: white; padding: 12px 20px; border-radius: 25px; text-decoration: none; font-weight: 500; display: inline-block; margin-bottom: 8px;">
+                        🛒 Shop Now
+                    </a>
+                    <br>
+                    <a href="/orders/history?userId=<%= user._id %>" style="background: linear-gradient(135deg, #FF9800, #F57C00); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.9em;">
+                        📋 Order History
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Stats Row -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2196F3; margin-bottom: 4px;">
+                        <%= typeof orderStats !== 'undefined' && orderStats.totalOrders ? orderStats.totalOrders : 0 %>
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">Total Orders</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #4CAF50; margin-bottom: 4px;">
+                        ₹<%= typeof orderStats !== 'undefined' && orderStats.totalSpent ? orderStats.totalSpent.toLocaleString() : 0 %>
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">Total Spent</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #FF9800; margin-bottom: 4px;">
+                        <%= typeof orderStats !== 'undefined' && orderStats.pendingOrders ? orderStats.pendingOrders : 0 %>
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">Active Orders</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #9C27B0; margin-bottom: 4px;">
+                        <%= new Date().toLocaleDateString() %>
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">Today's Date</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Search Section -->
+        <!-- <div class="search-section"> -->
+            <!-- <div class="search-header">
+                <h1>Find Fresh Products from Local Farmers</h1>
+                <p>Search thousands of products </p>
+            </div>
+            
+            <div class="search-container">
+                <form action="/search" method="GET" class="search-box">
+                    <input type="text" 
+                           name="q" 
+                           class="search-input" 
+                           placeholder="Search for fruits, vegetables, grains..." 
+                           id="searchInput"
+                           autocomplete="off">
+                    <button type="submit" class="search-btn">Search</button>
+                </form>
+                
+                <div class="suggestions" id="suggestions"></div>
+            </div> -->
+
+            <!-- <div class="quick-categories">
+                <% if (typeof categoryStats !== 'undefined' && categoryStats.length > 0) { %>
+                    <% categoryStats.forEach(category => { %>
+                        <a href="/search?category=<%= category._id %>" class="category-chip">
+                            <%= category._id.charAt(0).toUpperCase() + category._id.slice(1) %> 
+                            (<%= category.count %>)
+                        </a>
+                    <% }); %>
+                <% } else { %>
+                    <a href="/search?category=fruits&userId=<%= user._id %>" class="category-chip">Fruits</a>
+                    <a href="/search?category=vegetables&userId=<%= user._id %>" class="category-chip">Vegetables</a>
+                    <a href="/search?category=grains&userId=<%= user._id %>" class="category-chip">Grains</a>
+                    <a href="/search?category=dairy&userId=<%= user._id %>" class="category-chip">Dairy</a>
+                <% } %>
+            </div> -->
+        <!-- </div> -->
+
+        <!-- Featured Products
+        <div class="featured-section">
+            <h2 class="section-title">
+                Fresh Arrivals
+                <a href="/search?userId=<%= user._id %>" class="view-all-link">View All →</a>
+            </h2>
+            
+            <% if (typeof featuredProducts !== 'undefined' && featuredProducts.length > 0) { %>
+                <div class="products-grid">
+                    <% featuredProducts.forEach(product => { %>
+                        <div class="product-card">
+                            <div class="product-header">
+                                <div>
+                                    <div class="product-name">
+                                        <%= product.name %>
+                                        <% if (product.isOrganic) { %>
+                                            <span class="organic-badge">🌱 Organic</span>
+                                        <% } %>
+                                    </div>
+                                    <div class="product-category"><%= product.category %></div>
+                                </div>
+                                <div class="product-price">₹<%= product.price %>/<%= product.unit %></div>
+                            </div>
+                            
+                            <div class="product-farmer">
+                                👨‍🌾 <%= product.farmerName || (product.farmerId ? product.farmerId.name : 'Farmer') %>
+                            </div>
+
+                            
+                            <button class="contact-farmer-btn" 
+                                    data-farmer-name="<%= product.farmerName || (product.farmerId ? product.farmerId.name : 'Farmer') %>"
+                                    data-farmer-contact="<%= product.farmerContact || (product.farmerId ? product.farmerId.contact : '') %>"
+                                    onclick="contactFarmerHandler(this)">
+                                Contact Farmer
+                            </button>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="no-products">
+                    <p>No products available at the moment. Check back soon!</p>
+                </div>
+            <% } %>
+        </div> -->
+
+        <!-- Order Management Section -->
+        <div class="orders-section" style="margin: 40px 0;">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title">Your Orders</h2>
+                <a href="/orders/history?userId=<%= user._id %>" class="view-all-btn" style="color: #2196F3; text-decoration: none; font-weight: 500;">View All Orders →</a>
+            </div>
+            
+            <!-- Order Statistics -->
+            <div class="order-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                <div class="stat-card" style="background: linear-gradient(135deg, #2196F3, #1976D2); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                    <div class="stat-number" style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">
+                        <%= typeof orderStats !== 'undefined' && orderStats.totalOrders ? orderStats.totalOrders : 0 %>
+                    </div>
+                    <div class="stat-label" style="opacity: 0.9;">Total Orders</div>
+                </div>
+                
+                <div class="stat-card" style="background: linear-gradient(135deg, #4CAF50, #388E3C); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                    <div class="stat-number" style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">
+                        ₹<%= typeof orderStats !== 'undefined' && orderStats.totalSpent ? orderStats.totalSpent.toLocaleString() : 0 %>
+                    </div>
+                    <div class="stat-label" style="opacity: 0.9;">Total Spent</div>
+                </div>
+                
+                <div class="stat-card" style="background: linear-gradient(135deg, #FF9800, #F57C00); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                    <div class="stat-number" style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">
+                        <%= typeof orderStats !== 'undefined' && orderStats.pendingOrders ? orderStats.pendingOrders : 0 %>
+                    </div>
+                    <div class="stat-label" style="opacity: 0.9;">Pending Orders</div>
+                </div>
+                
+                <div class="stat-card" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                    <div class="stat-number" style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;">
+                        ₹<%= typeof orderStats !== 'undefined' && orderStats.averageOrder ? orderStats.averageOrder.toLocaleString() : 0 %>
+                    </div>
+                    <div class="stat-label" style="opacity: 0.9;">Average Order</div>
+                </div>
+            </div>
+            
+            <!-- Recent Orders -->
+            <div class="recent-orders">
+                <h3 style="margin-bottom: 15px; color: #333;">Recent Orders</h3>
+                <% if (typeof recentOrders !== 'undefined' && recentOrders.length > 0) { %>
+                    <div class="orders-grid" style="display: grid; gap: 15px;">
+                        <% recentOrders.slice(0, 3).forEach(order => { %>
+                            <div class="order-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border-left: 4px solid #2196F3;">
+                                <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <div class="order-id" style="font-weight: bold; color: #2196F3;">
+                                        Order #<%= order.orderNumber %>
+                                    </div>
+                                    <div class="order-status status-<%= order.status %>" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 500;">
+                                        <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-details" style="color: #666; font-size: 0.9em; margin-bottom: 10px;">
+                                    <div><strong>Product:</strong> <%= order.productName %></div>
+                                    <div><strong>Quantity:</strong> <%= order.quantity %> <%= order.unit %></div>
+                                    <div><strong>Total:</strong> ₹<%= order.totalAmount.toLocaleString() %></div>
+                                    <div><strong>Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></div>
+                                    <div><strong>Farmer:</strong> <%= order.farmerName %></div>
+                                </div>
+                                
+                                <div class="order-actions" style="display: flex; gap: 10px; margin-top: 12px;">
+                                    <a href="/orders/<%= order._id %>" class="btn-outline" style="padding: 6px 12px; border: 1px solid #2196F3; color: #2196F3; text-decoration: none; border-radius: 6px; font-size: 0.85em; text-align: center; flex: 1;">
+                                        View Details
+                                    </a>
+                                    <% if (order.status === 'pending' || order.status === 'confirmed') { %>
+                                        <button onclick="cancelOrder('<%= order._id %>')" class="btn-danger" style="padding: 6px 12px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; flex: 1;">
+                                            Cancel
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="no-orders" style="text-align: center; padding: 40px 20px; background: #f5f5f5; border-radius: 12px; margin: 20px 0;">
+                        <div style="font-size: 3em; margin-bottom: 15px;">📦</div>
+                        <h3 style="color: #666; margin-bottom: 10px;">No Orders Yet</h3>
+                        <p style="color: #999; margin-bottom: 20px;">Start shopping to see your orders here!</p>
+                        <a href="/search?userId=<%= user._id %>" style="background: #2196F3; color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; display: inline-block;">
+                            Start Shopping →
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Popular Categories
+        <div class="categories-section">
+            <h2 class="section-title">Shop by Category</h2>
+            
+            <div class="categories-grid">
+                <a href="/search?category=fruits" class="category-card">
+                    <div class="category-icon">🍎</div>
+                    <div class="category-name">Fruits</div>
+                    <div class="category-count">Fresh & Seasonal</div>
+                </a>
+                
+                <a href="/search?category=vegetables" class="category-card">
+                    <div class="category-icon">🥕</div>
+                    <div class="category-name">Vegetables</div>
+                    <div class="category-count">Farm Fresh</div>
+                </a>
+                
+                <a href="/search?category=grains" class="category-card">
+                    <div class="category-icon">🌾</div>
+                    <div class="category-name">Grains</div>
+                    <div class="category-count">Premium Quality</div>
+                </a>
+                
+                <a href="/search?category=dairy" class="category-card">
+                    <div class="category-icon">🥛</div>
+                    <div class="category-name">Dairy</div>
+                    <div class="category-count">Pure & Natural</div>
+                </a>
+                
+                <a href="/search?category=herbs" class="category-card">
+                    <div class="category-icon">🌿</div>
+                    <div class="category-name">Herbs</div>
+                    <div class="category-count">Organic Herbs</div>
+                </a>
+                
+                <a href="/search?organic=true" class="category-card">
+                    <div class="category-icon">🌱</div>
+                    <div class="category-name">Organic</div>
+                    <div class="category-count">Certified Organic</div>
+                </a>
+            </div>
+        </div> -->
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        let searchTimeout;
+
+        // Search suggestions
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`/api/suggestions?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displaySuggestions(data.suggestions);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching suggestions:', error);
+                    });
+            }, 300);
+        });
+
+        function displaySuggestions(suggestions) {
+            suggestionsDiv.innerHTML = '';
+            
+            if (suggestions.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+            
+            suggestions.forEach(suggestion => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <span>${suggestion.text}</span>
+                    <span class="suggestion-type">${suggestion.type}</span>
+                `;
+                item.addEventListener('click', () => {
+                    searchInput.value = suggestion.text;
+                    suggestionsDiv.style.display = 'none';
+                    document.querySelector('.search-box').submit();
+                });
+                suggestionsDiv.appendChild(item);
+            });
+            
+            suggestionsDiv.style.display = 'block';
+        }
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!searchInput.contains(event.target) && !suggestionsDiv.contains(event.target)) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        function contactFarmerHandler(button) {
+            const farmerName = button.getAttribute('data-farmer-name');
+            const contact = button.getAttribute('data-farmer-contact');
+            
+            if (contact) {
+                alert(`Contact ${farmerName}:\nPhone: ${contact}\n\nYou can call or message them directly to discuss the product details and purchase.`);
+            } else {
+                alert(`Contact ${farmerName} through the platform for more details.`);
+            }
+        }
+
+        // Order Management Functions
+        function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                fetch(`/orders/${orderId}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order cancelled successfully!');
+                        location.reload();
+                    } else {
+                        alert('Failed to cancel order: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cancelling order:', error);
+                    alert('Error cancelling order. Please try again.');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

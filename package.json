@@ -1,0 +1,17 @@
+{
+  "name": "agriconnect",
+  "version": "1.0.0",
+  "description": "Agricultural marketplace connecting farmers with clients",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.2",
+    "nodemon": "^3.1.11"
+  }
+}
