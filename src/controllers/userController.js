@@ -106,12 +106,35 @@ const registerUser = async (req, res) => {
 
 // Handle user logout
 const logoutUser = (req, res) => {
+    // Check if user is logged in
+    if (!req.session.user) {
+        // If AJAX request
+        if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+            return res.json({ success: true, message: 'Already logged out', redirectTo: '/' });
+        }
+        // If regular request
+        return res.redirect('/?message=Already logged out');
+    }
+
     req.session.destroy((err) => {
         if (err) {
             console.error('Logout error:', err);
-            return res.status(500).json({ success: false, message: 'Logout failed' });
+            // If AJAX request
+            if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+                return res.status(500).json({ success: false, message: 'Logout failed' });
+            }
+            // If regular request
+            return res.redirect('/?error=Logout failed, please try again');
         }
+        
         res.clearCookie('connect.sid'); // Clear session cookie
+        
+        // If AJAX request
+        if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+            return res.json({ success: true, message: 'Logged out successfully', redirectTo: '/' });
+        }
+        
+        // If regular request
         res.redirect('/?message=Logged out successfully');
     });
 };

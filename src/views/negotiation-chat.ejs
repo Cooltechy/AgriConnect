@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Price Negotiation - AgriConnect</title>
+    <title>Price Negotiation - FarmerMarketPlace</title>
     <style>
         * {
             margin: 0;
@@ -463,31 +463,69 @@
                         }
                     %>
                     
+                    <!-- Enhanced Offer Response Section -->
                     <% if (canAcceptDecline && lastPriceMessage) { %>
-                        <button type="button" class="btn btn-danger" id="declineBtn">
-                            Decline Offer
-                        </button>
-                        <button type="button" class="btn btn-success" id="acceptBtn">
-                            Accept Current Offer (₹<%= lastPriceMessage.priceOffered %>)
-                        </button>
+                        <div class="offer-response-section" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #007bff;">
+                            <h5 style="margin-bottom: 10px; color: #333;">💰 Current Offer: ₹<%= lastPriceMessage.priceOffered %> per <%= negotiation.unit %></h5>
+                            <p style="color: #666; margin-bottom: 15px;">Choose your response to this price offer:</p>
+                            
+                            <div class="response-buttons" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-success" id="acceptBtn" style="flex: 1; min-width: 120px;">
+                                    ✅ Accept (₹<%= lastPriceMessage.priceOffered %>)
+                                </button>
+                                <button type="button" class="btn btn-warning" id="sendCounterOfferBtn" style="flex: 1; min-width: 140px;">
+                                    🔄 Send Counter Offer
+                                </button>
+                                <button type="button" class="btn btn-danger" id="declineBtn" style="flex: 1; min-width: 120px;">
+                                    ❌ Decline Offer
+                                </button>
+                            </div>
+
+                        </div>
                     <% } else if (lastPriceMessage) { %>
-                        <div class="waiting-message" style="color: #666; font-style: italic; padding: 10px; text-align: center; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
-                            💭 Waiting for the other party to respond to your offer of ₹<%= lastPriceMessage.priceOffered %>
+                        <div class="waiting-response-section" style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #ffc107; text-align: center;">
+                            <h5 style="color: #856404; margin-bottom: 5px;">⏳ Waiting for Response</h5>
+                            <p style="color: #856404; margin-bottom: 0;">You offered ₹<%= lastPriceMessage.priceOffered %> per <%= negotiation.unit %>. Waiting for the other party to respond.</p>
                         </div>
                     <% } %>
                     
-                    <button type="submit" class="btn btn-primary" id="sendBtn">
-                        <% if (canAcceptDecline) { %>
-                            Send Counter Offer
-                        <% } else { %>
-                            Send Offer
-                        <% } %>
-                    </button>
+                    <!-- Initial Offer Section (Only show when no offers exist yet or when waiting for response and want to send new message) -->
+                    <% if (!lastPriceMessage || !canAcceptDecline) { %>
+                        <div class="initial-offer-section" style="margin-top: 15px;">
+                            <% if (!lastPriceMessage) { %>
+                                <h5 style="margin-bottom: 10px; color: #333;">💰 Make Your Initial Price Offer</h5>
+                                <p style="color: #666; margin-bottom: 15px;">Original price: ₹<%= negotiation.productId.price %> per <%= negotiation.unit %></p>
+                            <% } %>
+                            <button type="submit" class="btn btn-primary" id="sendBtn">
+                                <% if (lastPriceMessage && !canAcceptDecline) { %>
+                                    Send Message
+                                <% } else { %>
+                                    Send Initial Offer
+                                <% } %>
+                            </button>
+                            
+
+                        </div>
+                    <% } %>
                 </div>
             </form>
             <% } else if (negotiation.status === 'accepted') { %>
             <div class="negotiation-status">
                 🎉 Negotiation accepted! Final price: ₹<%= negotiation.finalPrice %> per <%= negotiation.unit %>
+                
+                <% if (currentUserType === 'buyer') { %>
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="/orders/place-order?productId=<%= negotiation.productId._id %>&negotiationId=<%= negotiation._id %>&quantity=<%= negotiation.quantity %>&agreedPrice=<%= negotiation.finalPrice %>" 
+                       class="btn btn-primary" 
+                       style="display: inline-block; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                        🛒 Place Order Now
+                    </a>
+                </div>
+                <% } else { %>
+                <div style="margin-top: 15px; text-align: center; color: #666;">
+                    <p>Waiting for buyer to place the order...</p>
+                </div>
+                <% } %>
             </div>
             <% } else if (negotiation.status === 'rejected') { %>
             <div class="negotiation-status status-rejected">
@@ -591,6 +629,111 @@
                 }
             });
         }
+
+        // Send Counter Offer button handler
+        const sendCounterOfferBtn = document.getElementById('sendCounterOfferBtn');
+        if (sendCounterOfferBtn) {
+            sendCounterOfferBtn.addEventListener('click', function() {
+                // Get price from the main priceOffer field
+                const priceOfferField = document.getElementById('priceOffer');
+                const counterPrice = priceOfferField ? priceOfferField.value : '';
+                
+                if (!counterPrice || counterPrice <= 0) {
+                    alert('Please enter a valid price in the price field above');
+                    // Focus on the priceOffer field to help user
+                    if (priceOfferField) {
+                        priceOfferField.focus();
+                    }
+                    return;
+                }
+                
+                this.classList.add('loading');
+                this.textContent = 'Sending...';
+                
+                // Send counter-offer via socket
+                socket.emit('send-message', {
+                    negotiationId: negotiationId,
+                    senderId: currentUserId,
+                    senderType: currentUserType,
+                    message: `Counter offer: ₹${counterPrice}`,
+                    priceOffered: parseFloat(counterPrice)
+                });
+                
+                // Clear the priceOffer field after sending
+                if (priceOfferField) {
+                    priceOfferField.value = '';
+                }
+                
+                // Reset after 1 second and reload to show new state
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            });
+        }
+
+        // Cancel counter offer button
+        const cancelCounterBtn = document.getElementById('cancelCounterBtn');
+        if (cancelCounterBtn) {
+            cancelCounterBtn.addEventListener('click', function() {
+                const counterSection = document.getElementById('counterOfferSection');
+                const responseButtons = document.querySelector('.response-buttons');
+                
+                // Hide counter offer section and show response buttons again
+                counterSection.style.display = 'none';
+                responseButtons.style.display = 'flex';
+            });
+        }
+
+        // Send counter offer button
+        const sendCounterBtn = document.getElementById('sendCounterBtn');
+        if (sendCounterBtn) {
+            sendCounterBtn.addEventListener('click', function() {
+                // Get price from the main priceOffer field instead of counter price input
+                const priceOfferField = document.getElementById('priceOffer');
+                const counterPrice = priceOfferField ? priceOfferField.value : '';
+                
+                if (!counterPrice || counterPrice <= 0) {
+                    alert('Please enter a valid price in the price field above');
+                    // Focus on the priceOffer field to help user
+                    if (priceOfferField) {
+                        priceOfferField.focus();
+                    }
+                    return;
+                }
+                
+                this.classList.add('loading');
+                this.textContent = 'Sending...';
+                
+                socket.emit('send-message', {
+                    negotiationId: negotiationId,
+                    senderId: currentUserId,
+                    senderType: currentUserType,
+                    message: `Counter offer: ₹${counterPrice}`,
+                    priceOffered: parseFloat(counterPrice)
+                });
+                
+                // Clear the priceOffer field after sending
+                if (priceOfferField) {
+                    priceOfferField.value = '';
+                }
+                
+                // Reset button state
+                this.classList.remove('loading');
+                this.textContent = 'Send Counter Offer';
+                
+                // Hide the counter offer section and reload to show new state
+                document.getElementById('counterOfferSection').style.display = 'none';
+                
+                // Reload page to show waiting state after sending counter offer
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            });
+        }
+        
+
+        
+
         
 
         

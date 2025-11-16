@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Dashboard - AgriConnect</title>
+    <title>Client Dashboard - FarmerMarketPlace</title>
     <style>
         * {
             margin: 0;
@@ -396,7 +396,7 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">🛒 AgriConnect - Marketplace</div>
+            <div class="logo">🛒 FarmerMarketPlace - Marketplace</div>
                         <div class="nav-links">
                 <a href="/search">Search Products</a>
                 <a href="/products">Browse Products</a>
@@ -854,7 +854,7 @@
                         <span>Price: ₹${neg.finalPrice || neg.initialPrice}</span>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <a href="/negotiations/${neg._id}/chat?userId=<%= user._id %>&userType=buyer" 
+                        <a href="/negotiations/${neg._id}/chat" 
                            style="flex: 1; padding: 8px 12px; background: #2196F3; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-size: 0.9em;">
                             💬 Open Chat
                         </a>

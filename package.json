@@ -1,5 +1,5 @@
 {
-  "name": "agriconnect",
+  "name": "farmermarketplace",
   "version": "1.0.0",
   "description": "Agricultural marketplace connecting farmers with clients",
   "main": "server.js",

@@ -7,10 +7,10 @@ const createNegotiation = async (req, res) => {
     try {
         const { buyerId, productId, quantity, offeredPrice, message } = req.body;
 
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productId).populate('farmerId', 'name contact');
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
 
-        const farmerId = product.farmerId;
+        const farmerId = product.farmerId._id || product.farmerId;
 
         const negotiation = new Negotiation({
             productId,
@@ -223,7 +223,14 @@ const finalizeNegotiation = async (req, res) => {
 const renderNegotiationChat = async (req, res) => {
     try {
         const { negotiationId } = req.params;
-        const { userId, userType } = req.query; // In real app, get from session/auth
+        
+        // Get user info from session (authenticated user)
+        if (!req.session.user || !req.session.user._id) {
+            return res.redirect('/login?error=Please log in to view negotiation');
+        }
+        
+        const currentUserId = req.session.user._id;
+        const sessionUserType = req.session.user.userType;
         
         const negotiation = await Negotiation.findById(negotiationId)
             .populate('productId', 'name price unit')
@@ -235,22 +242,27 @@ const renderNegotiationChat = async (req, res) => {
             return res.status(404).redirect('/search?error=Negotiation not found');
         }
 
-        // Determine current user type if not provided
-        let currentUserType = userType;
-        if (!currentUserType) {
-            if (negotiation.buyerId._id.toString() === userId) {
-                currentUserType = 'buyer';
-            } else if (negotiation.farmerId._id.toString() === userId) {
-                currentUserType = 'farmer';
-            } else {
-                return res.status(403).redirect('/search?error=Not authorized to view this negotiation');
-            }
+        // Determine current user type and verify authorization
+        let currentUserType;
+        if (negotiation.buyerId._id.toString() === currentUserId.toString()) {
+            currentUserType = 'buyer';
+        } else if (negotiation.farmerId._id.toString() === currentUserId.toString()) {
+            currentUserType = 'farmer';
+        } else {
+            return res.status(403).redirect('/search?error=Not authorized to view this negotiation');
+        }
+
+        // Verify session userType matches the negotiation role
+        if ((currentUserType === 'buyer' && sessionUserType !== 'client') || 
+            (currentUserType === 'farmer' && sessionUserType !== 'farmer')) {
+            return res.status(403).redirect('/search?error=User type mismatch');
         }
 
         res.render('negotiation-chat', {
             negotiation,
-            currentUserId: userId,
-            currentUserType
+            currentUserId: currentUserId,
+            currentUserType,
+            currentUser: req.session.user
         });
 
     } catch (error) {

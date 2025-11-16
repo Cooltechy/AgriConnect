@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Negotiations - AgriConnect</title>
+    <title>My Negotiations - FarmerMarketPlace</title>
     <style>
         * {
             margin: 0;
@@ -304,7 +304,7 @@
                         </div>
                         
                         <div class="action-buttons">
-                            <a href="/negotiations/<%= negotiation._id %>/chat?userId=<%= buyerId %>&userType=buyer" class="btn btn-primary">
+                            <a href="/negotiations/<%= negotiation._id %>/chat" class="btn btn-primary">
                                 💬 Continue Chat
                             </a>
                             <% if (negotiation.status === 'accepted') { %>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Negotiation Requests - AgriConnect</title>
+    <title>Negotiation Requests - FarmerMarketPlace</title>
     <style>
         * {
             margin: 0;
@@ -298,7 +298,7 @@
                         
                         <div class="buyer-info">
                             <div class="buyer-name">👤 <%= negotiation.buyerId ? negotiation.buyerId.name : 'Buyer Not Available' %></div>
-                            <div class="buyer-contact">📞 <%= negotiation.buyerId && negotiation.buyerId.contact ? negotiation.buyerId.contact : 'Contact not available' %></div>
+                            <div class="buyer-contact">� <%= negotiation.buyerId && negotiation.buyerId.contact ? negotiation.buyerId.contact : 'Contact not available' %></div>
                         </div>
                         
                         <div class="negotiation-details">
@@ -323,15 +323,15 @@
                         </div>
                         
                         <div class="messages-info">
-                            💬 <%= negotiation.messages.length %> messages exchanged
+                            � <%= negotiation.messages.length %> messages exchanged
                         </div>
                         
                         <div class="last-updated">
-                            🕒 Last updated: <%= new Date(negotiation.updatedAt).toLocaleDateString() %> at <%= new Date(negotiation.updatedAt).toLocaleTimeString() %>
+                            � Last updated: <%= new Date(negotiation.updatedAt).toLocaleDateString() %> at <%= new Date(negotiation.updatedAt).toLocaleTimeString() %>
                         </div>
                         
                         <div class="action-buttons">
-                            <a href="/negotiations/<%= negotiation._id %>/chat?userId=<%= farmerId %>&userType=farmer" class="btn btn-primary">
+                            <a href="/negotiations/<%= negotiation._id %>/chat" class="btn btn-primary">
                                 💬 Reply
                             </a>
                             <% if (negotiation.status === 'accepted') { %>

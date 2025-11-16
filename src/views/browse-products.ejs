@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browse Products - AgriConnect</title>
+    <title>Browse Products - FarmerMarketPlace</title>
     <style>
         * {
             margin: 0;
@@ -306,13 +306,13 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">🌾 AgriConnect - Marketplace</div>
+            <div class="logo">🌾 FarmerMarketPlace - Marketplace</div>
             <div class="nav-links">
                 <a href="/client-dashboard">Dashboard</a>
                 <a href="/products">Browse</a>
                 <a href="/orders/history">Orders</a>
                 <a href="#negotiations">Negotiations</a>
-                <a href="/">Logout</a>
+                <a href="/logout">Logout</a>
             </div>
         </div>
     </nav>
@@ -450,7 +450,7 @@
                 
                 if (existingNegotiation) {
                     if (confirm('You already have an active negotiation for this product. Would you like to continue the existing chat?')) {
-                        window.location.href = `/negotiations/${existingNegotiation._id}/chat?userId=<%= userId || '' %>&userType=buyer`;
+                        window.location.href = `/negotiations/${existingNegotiation._id}/chat`;
                         return;
                     } else {
                         return;
@@ -488,7 +488,7 @@
             .then(result => {
                 if (result.success) {
                     alert('Negotiation started! Redirecting to chat...');
-                    window.location.href = `/negotiations/${result.negotiationId}/chat?userId=${buyerId}&userType=buyer`;
+                    window.location.href = `/negotiations/${result.negotiationId}/chat`;
                 } else {
                     alert('Failed to start negotiation: ' + (result.message || 'Unknown error'));
                 }

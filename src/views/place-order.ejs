@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Place Order - AgriConnect</title>
+    <title>Place Order - FarmerMarketPlace</title>
     <style>
         * {
             margin: 0;
@@ -80,6 +80,11 @@
         .form-group select:focus {
             outline: none;
             border-color: #4CAF50;
+        }
+
+        .form-group select option:disabled {
+            color: #6c757d;
+            background-color: #f8f9fa;
         }
 
         .product-summary {
@@ -217,18 +222,34 @@
 
             <form id="orderForm">
                 <div class="section-title">👤 Buyer Information</div>
+                <p style="color: #6c757d; font-size: 14px; margin-bottom: 15px;">ℹ️ Information below is automatically filled from your account</p>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="buyerName">Full Name *</label>
-                        <input type="text" id="buyerName" name="buyerName" required>
+                        <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.name) { %>
+                            <input type="text" id="buyerName" name="buyerName" value="<%= currentUser.name %>" readonly 
+                                   style="background-color: #f8f9fa; color: #6c757d;">
+                        <% } else { %>
+                            <input type="text" id="buyerName" name="buyerName" required>
+                        <% } %>
                     </div>
                     <div class="form-group">
                         <label for="buyerEmail">Email *</label>
-                        <input type="email" id="buyerEmail" name="buyerEmail" required>
+                        <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.email) { %>
+                            <input type="email" id="buyerEmail" name="buyerEmail" value="<%= currentUser.email %>" readonly 
+                                   style="background-color: #f8f9fa; color: #6c757d;">
+                        <% } else { %>
+                            <input type="email" id="buyerEmail" name="buyerEmail" required>
+                        <% } %>
                     </div>
                     <div class="form-group">
                         <label for="buyerContact">Contact Number *</label>
-                        <input type="tel" id="buyerContact" name="buyerContact" required>
+                        <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.contact) { %>
+                            <input type="tel" id="buyerContact" name="buyerContact" value="<%= currentUser.contact %>" readonly 
+                                   style="background-color: #f8f9fa; color: #6c757d;">
+                        <% } else { %>
+                            <input type="tel" id="buyerContact" name="buyerContact" required>
+                        <% } %>
                     </div>
                     <div class="form-group">
                         <label for="quantity">Quantity (<%= product.unit %>) *</label>
@@ -265,10 +286,13 @@
                     <div class="form-group">
                         <label for="paymentMethod">Payment Method *</label>
                         <select id="paymentMethod" name="paymentMethod" required>
-                            <option value="cash-on-delivery">Cash on Delivery</option>
-                            <option value="online-payment">Online Payment</option>
-                            <option value="bank-transfer">Bank Transfer</option>
+                            <option value="cash-on-delivery">💵 Cash on Delivery (Available)</option>
+                            <option value="online-payment" disabled>💳 Online Payment (Coming Soon)</option>
+                            <option value="bank-transfer" disabled>🏦 Bank Transfer (Coming Soon)</option>
                         </select>
+                        <small style="color: #6c757d; margin-top: 5px; display: block;">
+                            ℹ️ Currently only Cash on Delivery is available. Other payment methods coming soon!
+                        </small>
                     </div>
                 </div>
 
@@ -318,8 +342,18 @@
             const formData = new FormData(this);
             const submitBtn = document.getElementById('submitBtn');
             
-            // Get buyer ID (in real app, from session/auth)
-            const buyerId = localStorage.getItem('userId') || 'demo-buyer-id';
+            // Get buyer ID from session
+            <% if (typeof currentUser !== 'undefined' && currentUser && currentUser._id) { %>
+                const buyerId = '<%= currentUser._id %>';
+            <% } else { %>
+                const buyerId = '';
+            <% } %>
+            
+            if (!buyerId) {
+                showMessage('Please log in to place an order');
+                window.location.href = '/login';
+                return;
+            }
 
             const orderData = {
                 buyerId: buyerId,
@@ -375,14 +409,7 @@
             }
         });
 
-        // Auto-fill demo data for testing
-        document.getElementById('buyerName').value = 'John Doe';
-        document.getElementById('buyerEmail').value = 'john.doe@email.com';
-        document.getElementById('buyerContact').value = '9876543210';
-        document.getElementById('street').value = '123 Main Street';
-        document.getElementById('city').value = 'Mumbai';
-        document.getElementById('state').value = 'Maharashtra';
-        document.getElementById('pincode').value = '400001';
+
     </script>
 </body>
 </html>
