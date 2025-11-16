@@ -4,7 +4,7 @@ const requireAuth = (req, res, next) => {
         return next();
     } else {
         // For AJAX requests
-        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
             return res.status(401).json({ 
                 success: false, 
                 message: 'Authentication required',
@@ -34,7 +34,7 @@ const requireFarmer = (req, res, next) => {
     if (req.session && req.session.user && req.session.user.userType === 'farmer') {
         return next();
     } else {
-        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
             return res.status(403).json({ 
                 success: false, 
                 message: 'Farmer access required' 
@@ -48,7 +48,7 @@ const requireClient = (req, res, next) => {
     if (req.session && req.session.user && req.session.user.userType === 'client') {
         return next();
     } else {
-        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
             return res.status(403).json({ 
                 success: false, 
                 message: 'Client access required' 
