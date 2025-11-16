@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const User = require('../models/User');
+const Negotiation = require('../models/Negotiation');
 const mongoose = require('mongoose');
 
 // Place a new order
@@ -8,7 +9,8 @@ const placeOrder = async (req, res) => {
     try {
         const {
             buyerId, buyerName, buyerEmail, buyerContact,
-            productId, quantity, deliveryAddress, notes, paymentMethod
+            productId, quantity, deliveryAddress, notes, paymentMethod,
+            negotiationId
         } = req.body;
 
         // Get product details
@@ -28,6 +30,23 @@ const placeOrder = async (req, res) => {
             });
         }
 
+        // If negotiationId provided, validate negotiation and use final price
+        let pricePerUnit = product.price;
+        if (negotiationId) {
+            const negotiation = await Negotiation.findById(negotiationId);
+            if (!negotiation) {
+                return res.status(404).json({ success: false, message: 'Negotiation not found' });
+            }
+            if (negotiation.status !== 'accepted') {
+                return res.status(400).json({ success: false, message: 'Negotiation must be accepted before placing an order' });
+            }
+            // Check buyer matches
+            if (negotiation.buyerId.toString() !== buyerId) {
+                return res.status(403).json({ success: false, message: 'Buyer mismatch for negotiation' });
+            }
+            pricePerUnit = negotiation.finalPrice || pricePerUnit;
+        }
+
         // Create new order
         const newOrder = new Order({
             buyerId,
@@ -42,13 +61,26 @@ const placeOrder = async (req, res) => {
             farmerContact: product.farmerContact,
             quantity: parseInt(quantity),
             unit: product.unit,
-            pricePerUnit: product.price,
+            pricePerUnit: pricePerUnit,
             deliveryAddress,
             notes,
             paymentMethod: paymentMethod || 'cash-on-delivery'
         });
 
         await newOrder.save();
+
+        // If negotiation was used, mark it finalized
+        if (negotiationId) {
+            try {
+                const negotiation = await Negotiation.findById(negotiationId);
+                if (negotiation) {
+                    negotiation.status = 'finalized';
+                    await negotiation.save();
+                }
+            } catch (e) {
+                console.warn('Warning: failed to finalize negotiation:', e.message);
+            }
+        }
 
         // Update product quantity
         product.quantity -= quantity;
@@ -290,6 +322,14 @@ const getBuyerOrderHistory = async (req, res) => {
 const getOrderDetails = async (req, res) => {
     try {
         const { orderId } = req.params;
+        
+        // Validate ObjectId format
+        const mongoose = require('mongoose');
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).render('order-details', {
+                error: 'Invalid order ID format'
+            });
+        }
         
         const order = await Order.findById(orderId)
             .populate('productId', 'name category unit')
@@ -603,11 +643,52 @@ const getFarmerOrderHistory = async (req, res) => {
     }
 };
 
+// Render place order page
+const renderPlaceOrder = async (req, res) => {
+    try {
+        const { productId, negotiationId, quantity, agreedPrice } = req.query;
+        
+        const product = await Product.findById(productId)
+            .populate('farmerId', 'name contact');
+            
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        
+        let negotiation = null;
+        let currentPrice = product.price;
+        
+        if (negotiationId) {
+            negotiation = await Negotiation.findById(negotiationId);
+            if (negotiation && negotiation.status === 'accepted') {
+                currentPrice = negotiation.finalPrice;
+            }
+        } else if (agreedPrice) {
+            currentPrice = parseFloat(agreedPrice);
+        }
+        
+        res.render('place-order', {
+            product,
+            negotiation,
+            negotiationId: negotiationId || null,
+            currentPrice,
+            defaultQuantity: parseInt(quantity) || 1
+        });
+        
+    } catch (error) {
+        console.error('Error rendering place order page:', error);
+        res.status(500).json({ error: 'Failed to load order page' });
+    }
+};
+
+
+
 module.exports = {
     placeOrder,
     getBuyerOrderHistory,
     getFarmerOrderHistory,
     getOrderDetails,
     cancelOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    renderPlaceOrder
 };

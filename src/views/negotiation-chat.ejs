@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Negotiation - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .product-details h2 {
+            margin-bottom: 5px;
+        }
+        
+        .product-details p {
+            opacity: 0.9;
+        }
+        
+        .negotiation-info {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-open { background: #fff3cd; color: #856404; }
+        .status-accepted { background: #d1edff; color: #0c5460; }
+        .status-rejected { background: #ffebee; color: #c62828; }
+        .status-finalized { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .message.buyer {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .message.farmer .message-avatar {
+            background: #4CAF50;
+        }
+        
+        .message.buyer .message-avatar {
+            background: #2196F3;
+        }
+        
+        .message-content {
+            flex: 1;
+            max-width: 70%;
+        }
+        
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .message.farmer .message-bubble {
+            background: #4CAF50;
+            color: white;
+            border-bottom-left-radius: 6px;
+        }
+        
+        .message.buyer .message-bubble {
+            background: #2196F3;
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .price-offer {
+            background: #fff3cd !important;
+            color: #856404 !important;
+            border: 2px solid #ffeaa7;
+            font-weight: bold;
+            text-align: center;
+            margin: 5px 0;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .message.farmer .message-time {
+            text-align: left;
+        }
+        
+        .message.buyer .message-time {
+            text-align: right;
+        }
+        
+        .input-section {
+            background: white;
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .negotiation-status {
+            text-align: center;
+            padding: 15px;
+            background: #e9ecef;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .price-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .price-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .price-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .message-input {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .typing-indicator {
+            margin-bottom: 10px;
+        }
+        
+        .typing-indicator .message-bubble {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .price-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="product-info">
+                <div class="product-details">
+                    <h2><%= negotiation.productId.name %></h2>
+                    <p>Negotiating with <%= currentUserType === 'buyer' ? negotiation.farmerId.name : negotiation.buyerId.name %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="negotiation-info">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Quantity</span>
+                    <span class="info-value"><%= negotiation.quantity %> <%= negotiation.unit %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Original Price</span>
+                    <span class="info-value">₹<%= negotiation.productId.price %> per <%= negotiation.unit %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status</span>
+                    <span class="status-badge status-<%= negotiation.status %>"><%= negotiation.status %></span>
+                </div>
+                <% if (negotiation.finalPrice) { %>
+                <div class="info-item">
+                    <span class="info-label">Final Price</span>
+                    <span class="info-value">₹<%= negotiation.finalPrice %> per <%= negotiation.unit %></span>
+                </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="chat-container" id="chatContainer">
+            <% negotiation.messages.forEach(function(message) { %>
+            <div class="message <%= message.senderType %>">
+                <div class="message-avatar">
+                    <%= message.senderType === 'farmer' ? 'F' : 'B' %>
+                </div>
+                <div class="message-content">
+                    <% if (message.priceOffered) { %>
+                    <div class="message-bubble price-offer">
+                        💰 Price Offer: ₹<%= message.priceOffered %> per <%= negotiation.unit %>
+                    </div>
+                    <% } %>
+                    <% if (message.message) { %>
+                    <div class="message-bubble">
+                        <%= message.message %>
+                    </div>
+                    <% } %>
+                    <div class="message-time">
+                        <%= new Date(message.timestamp).toLocaleString() %>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        
+        <div class="input-section">
+            <div id="messageArea"></div>
+            
+            <% if (negotiation.status === 'open') { %>
+            <form class="input-form" id="messageForm">
+                <div class="price-input-group">
+                    <input type="number" 
+                           class="price-input" 
+                           id="priceOffer" 
+                           placeholder="Enter price per <%= negotiation.unit %> (₹)"
+                           min="0"
+                           step="0.01">
+                    <span>₹ per <%= negotiation.unit %></span>
+                </div>
+                
+                <textarea class="message-input" 
+                          id="messageText" 
+                          placeholder="Add a message (optional)..."
+                          rows="3"></textarea>
+                
+                <div class="action-buttons">
+                    <%
+                        // Find the last message with a price offer (excluding system messages)
+                        let lastPriceMessage = null;
+                        for (let i = negotiation.messages.length - 1; i >= 0; i--) {
+                            const msg = negotiation.messages[i];
+                            if (msg.priceOffered !== null && msg.priceOffered !== undefined && msg.priceOffered > 0) {
+                                // Make sure it's not a system acceptance message
+                                if (!msg.message || !msg.message.includes('Accepted at')) {
+                                    lastPriceMessage = msg;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        let canAcceptDecline = false;
+                        
+                        if (lastPriceMessage) {
+                            // Get the actual ID from senderId (handle both object and string cases)
+                            let lastOfferSenderId;
+                            if (typeof lastPriceMessage.senderId === 'object' && lastPriceMessage.senderId._id) {
+                                lastOfferSenderId = lastPriceMessage.senderId._id.toString();
+                            } else {
+                                lastOfferSenderId = lastPriceMessage.senderId.toString();
+                            }
+                            
+                            // Show accept/decline buttons only if the current user is NOT the one who sent the last offer
+                            canAcceptDecline = lastOfferSenderId !== currentUserId.toString();
+                        }
+                    %>
+                    
+                    <% if (canAcceptDecline && lastPriceMessage) { %>
+                        <button type="button" class="btn btn-danger" id="declineBtn">
+                            Decline Offer
+                        </button>
+                        <button type="button" class="btn btn-success" id="acceptBtn">
+                            Accept Current Offer (₹<%= lastPriceMessage.priceOffered %>)
+                        </button>
+                    <% } else if (lastPriceMessage) { %>
+                        <div class="waiting-message" style="color: #666; font-style: italic; padding: 10px; text-align: center; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
+                            💭 Waiting for the other party to respond to your offer of ₹<%= lastPriceMessage.priceOffered %>
+                        </div>
+                    <% } %>
+                    
+                    <button type="submit" class="btn btn-primary" id="sendBtn">
+                        <% if (canAcceptDecline) { %>
+                            Send Counter Offer
+                        <% } else { %>
+                            Send Offer
+                        <% } %>
+                    </button>
+                </div>
+            </form>
+            <% } else if (negotiation.status === 'accepted') { %>
+            <div class="negotiation-status">
+                🎉 Negotiation accepted! Final price: ₹<%= negotiation.finalPrice %> per <%= negotiation.unit %>
+            </div>
+            <% } else if (negotiation.status === 'rejected') { %>
+            <div class="negotiation-status status-rejected">
+                ❌ Negotiation declined. No agreement was reached on the price.
+            </div>
+            <% } else { %>
+            <div class="negotiation-status">
+                This negotiation is <%= negotiation.status %> and no longer active.
+            </div>
+            <% } %>
+        </div>
+    </div>
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const negotiationId = '<%= negotiation._id %>';
+        const currentUserId = '<%= currentUserId %>';
+        const currentUserType = '<%= currentUserType %>';
+        const productId = '<%= negotiation.productId._id %>';
+        
+        // Initialize Socket.IO connection
+        const socket = io();
+        let isTyping = false;
+        let typingTimeout;
+        
+        // Join negotiation room
+        socket.emit('join-negotiation', negotiationId);
+        
+        // Auto-scroll to bottom
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Show message
+        function showMessage(message, type = 'error') {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</div>`;
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Send message/offer via Socket.IO
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const priceOffer = document.getElementById('priceOffer').value;
+            const messageText = document.getElementById('messageText').value;
+            
+            if (!priceOffer && !messageText.trim()) {
+                showMessage('Please enter a price offer or message');
+                return;
+            }
+            
+            // Send via Socket.IO
+            socket.emit('send-message', {
+                negotiationId: negotiationId,
+                senderId: currentUserId,
+                senderType: currentUserType,
+                priceOffered: priceOffer ? parseFloat(priceOffer) : null,
+                message: messageText.trim() || null
+            });
+            
+            // Clear form
+            document.getElementById('priceOffer').value = '';
+            document.getElementById('messageText').value = '';
+            
+            // Stop typing indicator
+            socket.emit('stop-typing', { negotiationId, userId: currentUserId });
+        });
+        
+        // Accept negotiation via Socket.IO (only if button exists)
+        const acceptBtn = document.getElementById('acceptBtn');
+        if (acceptBtn) {
+            acceptBtn.addEventListener('click', function() {
+                this.classList.add('loading');
+                this.textContent = 'Accepting...';
+                
+                socket.emit('accept-negotiation', {
+                    negotiationId: negotiationId,
+                    accepterId: currentUserId
+                });
+            });
+        }
+        
+        // Decline negotiation via Socket.IO (only if button exists)
+        const declineBtn = document.getElementById('declineBtn');
+        if (declineBtn) {
+            declineBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to decline this negotiation? This action cannot be undone.')) {
+                    this.classList.add('loading');
+                    this.textContent = 'Declining...';
+                    
+                    socket.emit('decline-negotiation', {
+                        negotiationId: negotiationId,
+                        declinerId: currentUserId
+                    });
+                }
+            });
+        }
+        
+
+        
+        // Socket.IO event listeners
+        socket.on('new-message', function(data) {
+            addMessageToChat(data);
+            scrollToBottom();
+        });
+        
+        socket.on('negotiation-accepted', function(data) {
+            showMessage(`Negotiation accepted at ₹${data.finalPrice}!`, 'success');
+            setTimeout(() => {
+                location.reload(); // Reload to show accepted state
+            }, 2000);
+        });
+        
+        socket.on('negotiation-declined', function(data) {
+            showMessage('Negotiation has been declined.', 'error');
+            setTimeout(() => {
+                location.reload(); // Reload to show declined state
+            }, 2000);
+        });
+        
+        socket.on('user-typing', function(data) {
+            if (data.userId !== currentUserId) {
+                showTypingIndicator(data.userType);
+            }
+        });
+        
+        socket.on('user-stop-typing', function(data) {
+            if (data.userId !== currentUserId) {
+                hideTypingIndicator();
+            }
+        });
+        
+        socket.on('error', function(data) {
+            showMessage(data.message);
+        });
+        
+        // Add new message to chat UI
+        function addMessageToChat(messageData) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${messageData.senderType}`;
+            
+            let messageContent = `
+                <div class="message-avatar">
+                    ${messageData.senderType === 'farmer' ? 'F' : 'B'}
+                </div>
+                <div class="message-content">
+            `;
+            
+            if (messageData.priceOffered) {
+                messageContent += `
+                    <div class="message-bubble price-offer">
+                        💰 Price Offer: ₹${messageData.priceOffered} per <%= negotiation.unit %>
+                    </div>
+                `;
+            }
+            
+            if (messageData.message) {
+                messageContent += `
+                    <div class="message-bubble">
+                        ${messageData.message}
+                    </div>
+                `;
+            }
+            
+            messageContent += `
+                    <div class="message-time">
+                        ${new Date(messageData.timestamp).toLocaleString()}
+                    </div>
+                </div>
+            `;
+            
+            messageDiv.innerHTML = messageContent;
+            chatContainer.appendChild(messageDiv);
+        }
+        
+        // Typing indicators
+        let typingIndicatorElement = null;
+        
+        function showTypingIndicator(userType) {
+            if (!typingIndicatorElement) {
+                typingIndicatorElement = document.createElement('div');
+                typingIndicatorElement.className = 'typing-indicator';
+                typingIndicatorElement.innerHTML = `
+                    <div class="message ${userType}">
+                        <div class="message-avatar">
+                            ${userType === 'farmer' ? 'F' : 'B'}
+                        </div>
+                        <div class="message-content">
+                            <div class="message-bubble" style="font-style: italic; opacity: 0.7;">
+                                typing...
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('chatContainer').appendChild(typingIndicatorElement);
+                scrollToBottom();
+            }
+        }
+        
+        function hideTypingIndicator() {
+            if (typingIndicatorElement) {
+                typingIndicatorElement.remove();
+                typingIndicatorElement = null;
+            }
+        }
+        
+        // Typing detection
+        document.getElementById('messageText').addEventListener('input', function() {
+            if (!isTyping) {
+                isTyping = true;
+                socket.emit('typing', {
+                    negotiationId: negotiationId,
+                    userId: currentUserId,
+                    userType: currentUserType
+                });
+            }
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                isTyping = false;
+                socket.emit('stop-typing', {
+                    negotiationId: negotiationId,
+                    userId: currentUserId
+                });
+            }, 1000);
+        });
+        
+        // Initial scroll to bottom
+        scrollToBottom();
+    </script>
+</body>
+</html>

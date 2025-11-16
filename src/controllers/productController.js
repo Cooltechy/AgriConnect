@@ -147,7 +147,7 @@ const showFarmerProducts = async (req, res) => {
 // Show all products (browse)
 const showAllProducts = async (req, res) => {
     try {
-        const { category, location, minPrice, maxPrice, organic } = req.query;
+        const { category, location, minPrice, maxPrice, organic, userId } = req.query;
         
         let filter = { isAvailable: true };
         
@@ -173,8 +173,20 @@ const showAllProducts = async (req, res) => {
             .populate('farmerId', 'name contact')
             .sort({ createdAt: -1 });
 
+        // Get user's negotiations if userId provided
+        let userNegotiations = [];
+        if (userId) {
+            const Negotiation = require('../models/Negotiation');
+            userNegotiations = await Negotiation.find({ 
+                buyerId: userId,
+                status: { $in: ['open', 'accepted'] }
+            }).populate('productId');
+        }
+
         res.render('browse-products', {
             products,
+            userNegotiations,
+            userId: userId || null,
             filters: req.query,
             categories: ['fruits', 'vegetables', 'grains', 'dairy', 'meat', 'herbs', 'other']
         });
@@ -184,6 +196,8 @@ const showAllProducts = async (req, res) => {
         res.status(500).render('browse-products', {
             error: 'Failed to load products',
             products: [],
+            userNegotiations: [],
+            userId: null,
             filters: {},
             categories: []
         });

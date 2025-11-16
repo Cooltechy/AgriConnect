@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Negotiation Requests - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .negotiations-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        }
+        
+        .negotiation-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .negotiation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-color: #FF9800;
+        }
+        
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .product-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .product-category {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: capitalize;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-open {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-accepted {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status-finalized {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .negotiation-details {
+            margin-bottom: 15px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .detail-label {
+            color: #666;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .buyer-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .buyer-name {
+            font-weight: 600;
+            color: #FF9800;
+            margin-bottom: 3px;
+        }
+        
+        .buyer-contact {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .messages-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .last-updated {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 15px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #F57C00;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #999;
+        }
+        
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #FF9800;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .urgent-badge {
+            background: #ff5722;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .negotiations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤝 Negotiation Requests</h1>
+            <p>Manage price negotiations from buyers</p>
+        </div>
+        
+        <div class="content">
+            <a href="/farmer-dashboard" class="back-link">← Back to Dashboard</a>
+            
+            <% if (negotiations && negotiations.length > 0) { %>
+                <div class="negotiations-grid">
+                    <% negotiations.forEach(function(negotiation) { %>
+                    <div class="negotiation-card">
+                        <div class="product-info">
+                            <div>
+                                <div class="product-name">
+                                    <%= negotiation.productId.name %>
+                                    <% if (negotiation.status === 'open' && negotiation.messages.length > 0) { %>
+                                        <span class="urgent-badge">New</span>
+                                    <% } %>
+                                </div>
+                                <div class="product-category">📦 <%= negotiation.productId.category %></div>
+                            </div>
+                            <span class="status-badge status-<%= negotiation.status %>">
+                                <%= negotiation.status %>
+                            </span>
+                        </div>
+                        
+                        <div class="buyer-info">
+                            <div class="buyer-name">👤 <%= negotiation.buyerId ? negotiation.buyerId.name : 'Buyer Not Available' %></div>
+                            <div class="buyer-contact">📞 <%= negotiation.buyerId && negotiation.buyerId.contact ? negotiation.buyerId.contact : 'Contact not available' %></div>
+                        </div>
+                        
+                        <div class="negotiation-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Requested Qty:</span>
+                                <span class="detail-value"><%= negotiation.quantity %> <%= negotiation.unit %></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Your Price:</span>
+                                <span class="detail-value">₹<%= negotiation.productId.price %> per <%= negotiation.unit %></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Offered Price:</span>
+                                <span class="detail-value" style="color: #FF9800;">₹<%= negotiation.initialPrice %> per <%= negotiation.unit %></span>
+                            </div>
+                            <% if (negotiation.finalPrice) { %>
+                            <div class="detail-row">
+                                <span class="detail-label">Agreed Price:</span>
+                                <span class="detail-value" style="color: #4CAF50;">₹<%= negotiation.finalPrice %> per <%= negotiation.unit %></span>
+                            </div>
+                            <% } %>
+                        </div>
+                        
+                        <div class="messages-info">
+                            💬 <%= negotiation.messages.length %> messages exchanged
+                        </div>
+                        
+                        <div class="last-updated">
+                            🕒 Last updated: <%= new Date(negotiation.updatedAt).toLocaleDateString() %> at <%= new Date(negotiation.updatedAt).toLocaleTimeString() %>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="/negotiations/<%= negotiation._id %>/chat?userId=<%= farmerId %>&userType=farmer" class="btn btn-primary">
+                                💬 Reply
+                            </a>
+                            <% if (negotiation.status === 'accepted') { %>
+                            <span class="btn btn-success" style="cursor: default;">
+                                ✅ Accepted
+                            </span>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <h3>No negotiation requests yet</h3>
+                    <p>Buyers haven't started any negotiations for your products yet.</p>
+                    <a href="/farmer-dashboard" class="btn btn-primary">Go to Dashboard</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

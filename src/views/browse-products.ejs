@@ -155,6 +155,38 @@
             color: #2196F3;
             margin-bottom: 10px;
         }
+        
+        .negotiation-price {
+            font-size: 1rem;
+            font-weight: normal;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+        }
+        
+        .negotiation-open {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+        
+        .negotiation-accepted {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+        }
+        
+        .price-comparison {
+            font-size: 0.9rem;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+        
+        .savings {
+            color: #4CAF50;
+        }
+        
+        .negotiating {
+            color: #FF9800;
+        }
 
         .product-details {
             margin-bottom: 15px;
@@ -202,8 +234,9 @@
         }
 
         .product-actions {
-            display: flex;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
         }
 
         .btn {
@@ -278,6 +311,7 @@
                 <a href="/client-dashboard">Dashboard</a>
                 <a href="/products">Browse</a>
                 <a href="/orders/history">Orders</a>
+                <a href="#negotiations">Negotiations</a>
                 <a href="/">Logout</a>
             </div>
         </div>
@@ -350,7 +384,10 @@
                             </div>
                         </div>
 
-                        <div class="product-price">₹<%= product.price.toLocaleString() %>/<%= product.unit %></div>
+                        <div class="product-price">
+                            ₹<%= product.price.toLocaleString() %>/<%= product.unit %>
+                            <div class="negotiation-price" id="negotiation-<%= product._id %>" style="display: none;"></div>
+                        </div>
 
                         <div class="product-details">
                             <div class="detail-row">
@@ -382,6 +419,7 @@
 
                         <div class="product-actions">
                             <a href="tel:<%= product.farmerContact %>" class="btn btn-outline">📞 Call</a>
+                            <button onclick="negotiatePrice('<%= product._id %>', '<%= product.price %>', '<%= product.unit %>')" class="btn btn-outline">💬 Negotiate</button>
                             <button onclick="orderProduct('<%= product._id %>')" class="btn btn-primary">🛒 Order</button>
                         </div>
                     </div>
@@ -397,9 +435,249 @@
 
     <script>
         function orderProduct(productId) {
-            // In a real app, this would open an order form
-            alert('Order functionality coming soon! Please call the farmer directly for now.');
+            // Redirect to order page
+            const params = new URLSearchParams({
+                productId: productId
+            });
+            window.location.href = '/place-order?' + params.toString();
         }
+        
+        function negotiatePrice(productId, currentPrice, unit) {
+            // Check if there's already an active negotiation for this product
+            <% if (userNegotiations && userNegotiations.length > 0) { %>
+                const negotiations = <%- JSON.stringify(userNegotiations) %>;
+                const existingNegotiation = negotiations.find(n => n.productId._id === productId && n.status === 'open');
+                
+                if (existingNegotiation) {
+                    if (confirm('You already have an active negotiation for this product. Would you like to continue the existing chat?')) {
+                        window.location.href = `/negotiations/${existingNegotiation._id}/chat?userId=<%= userId || '' %>&userType=buyer`;
+                        return;
+                    } else {
+                        return;
+                    }
+                }
+            <% } %>
+            
+            // Show negotiation modal or redirect to negotiation page
+            const quantity = prompt(`How many ${unit} would you like to negotiate for?`, '1');
+            if (!quantity || quantity <= 0) return;
+            
+            const offeredPrice = prompt(`Current price is ₹${currentPrice} per ${unit}. What price would you like to offer?`, currentPrice);
+            if (!offeredPrice) return;
+            
+            const message = prompt('Add a message (optional):');
+            
+            // Get current user ID (in real app, from session/auth)
+            const buyerId = '<%= userId %>' || localStorage.getItem('userId') || 'demo-buyer-id';
+            
+            // Create negotiation
+            fetch('/negotiations/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    buyerId: buyerId,
+                    productId: productId,
+                    quantity: parseInt(quantity),
+                    offeredPrice: parseFloat(offeredPrice),
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Negotiation started! Redirecting to chat...');
+                    window.location.href = `/negotiations/${result.negotiationId}/chat?userId=${buyerId}&userType=buyer`;
+                } else {
+                    alert('Failed to start negotiation: ' + (result.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+            });
+        }
+        
+        // Display negotiation prices
+        function displayNegotiationPrices() {
+            <% if (userNegotiations && userNegotiations.length > 0) { %>
+                const negotiations = <%- JSON.stringify(userNegotiations) %>;
+                
+                negotiations.forEach(negotiation => {
+                    const productId = negotiation.productId._id;
+                    const negotiationElement = document.getElementById(`negotiation-${productId}`);
+                    
+                    if (negotiationElement) {
+                        const originalPrice = negotiation.productId.price;
+                        const negotiatedPrice = negotiation.finalPrice || negotiation.initialPrice;
+                        const status = negotiation.status;
+                        
+                        let html = '';
+                        let className = '';
+                        
+                        if (status === 'open') {
+                            className = 'negotiation-open';
+                            html = `💬 Negotiating: ₹${negotiatedPrice}/${negotiation.unit}`;
+                            
+                            if (negotiatedPrice < originalPrice) {
+                                const savings = originalPrice - negotiatedPrice;
+                                html += `<div class="price-comparison negotiating">Potential savings: ₹${savings}/${negotiation.unit}</div>`;
+                            }
+                        } else if (status === 'accepted') {
+                            className = 'negotiation-accepted';
+                            html = `✅ Agreed: ₹${negotiatedPrice}/${negotiation.unit}`;
+                            
+                            if (negotiatedPrice < originalPrice) {
+                                const savings = originalPrice - negotiatedPrice;
+                                html += `<div class="price-comparison savings">You saved: ₹${savings}/${negotiation.unit}</div>`;
+                            }
+                        }
+                        
+                        negotiationElement.className = `negotiation-price ${className}`;
+                        negotiationElement.innerHTML = html;
+                        negotiationElement.style.display = 'block';
+                        
+                        // Add click handler to open negotiation chat
+                        negotiationElement.style.cursor = 'pointer';
+                        negotiationElement.onclick = function() {
+                            window.location.href = `/negotiations/${negotiation._id}/chat?userId=<%= userId %>&userType=buyer`;
+                        };
+                    }
+                });
+            <% } %>
+        }
+        
+        // Set demo user ID for testing
+        if (!localStorage.getItem('userId')) {
+            localStorage.setItem('userId', 'demo-buyer-' + Date.now());
+        }
+        
+        // Call on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            displayNegotiationPrices();
+        });
+        
+        // Display negotiation prices
+        function displayNegotiationPrices() {
+            <% if (userNegotiations && userNegotiations.length > 0) { %>
+                const negotiations = <%- JSON.stringify(userNegotiations) %>;
+                
+                negotiations.forEach(negotiation => {
+                    const productId = negotiation.productId._id;
+                    const negotiationElement = document.getElementById(`negotiation-${productId}`);
+                    
+                    if (negotiationElement) {
+                        const originalPrice = negotiation.productId.price;
+                        const negotiatedPrice = negotiation.finalPrice || negotiation.initialPrice;
+                        const status = negotiation.status;
+                        
+                        let html = '';
+                        let className = '';
+                        
+                        if (status === 'open') {
+                            className = 'negotiation-open';
+                            html = `💬 Negotiating: ₹${negotiatedPrice}/${negotiation.unit}`;
+                            
+                            if (negotiatedPrice < originalPrice) {
+                                const savings = originalPrice - negotiatedPrice;
+                                html += `<div class="price-comparison negotiating">Potential savings: ₹${savings}/${negotiation.unit}</div>`;
+                            }
+                        } else if (status === 'accepted') {
+                            className = 'negotiation-accepted';
+                            html = `✅ Agreed: ₹${negotiatedPrice}/${negotiation.unit}`;
+                            
+                            if (negotiatedPrice < originalPrice) {
+                                const savings = originalPrice - negotiatedPrice;
+                                html += `<div class="price-comparison savings">You saved: ₹${savings}/${negotiation.unit}</div>`;
+                            }
+                        }
+                        
+                        negotiationElement.className = `negotiation-price ${className}`;
+                        negotiationElement.innerHTML = html;
+                        negotiationElement.style.display = 'block';
+                        
+                        // Add click handler to open negotiation chat
+                        negotiationElement.style.cursor = 'pointer';
+                        negotiationElement.onclick = function() {
+                            window.location.href = `/negotiations/${negotiation._id}/chat?userId=<%= userId %>&userType=buyer`;
+                        };
+                    }
+                });
+            <% } %>
+        }
+        
+        // Call on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            displayNegotiationPrices();
+        });
     </script>
 </body>
-</html>
+</html>    <!-- Negotiation Setup Modal -->
+    <div class="negotiation-modal" id="negotiationModal">
+        <div class="negotiation-modal-content">
+            <div class="negotiation-modal-header">
+                <h2 class="negotiation-modal-title">💬 Start Price Negotiation</h2>
+                <button class="close-modal" onclick="closeNegotiationModal()">&times;</button>
+            </div>
+            
+            <div class="negotiation-modal-body">
+                <div class="success-message" id="negotiationSuccessMessage" style="display: none;"></div>
+                <div class="error-message" id="negotiationErrorMessage" style="display: none;"></div>
+                
+                <!-- Product Preview -->
+                <div class="product-preview">
+                    <h3 id="negotiationProductName">Product Name</h3>
+                    <div class="current-price-info">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span>Current Price:</span>
+                            <span style="font-weight: bold; font-size: 18px;" id="negotiationCurrentPrice">₹0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Category:</span>
+                            <span id="negotiationProductCategory">Category</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Negotiation Form -->
+                <div class="negotiation-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="negotiationQuantity">Quantity Needed</label>
+                            <input type="number" class="form-input" id="negotiationQuantity" 
+                                   placeholder="Enter quantity" min="1" value="1" required>
+                            <small style="color: #666; font-size: 12px;">Available: <span id="negotiationAvailable">0</span> <span id="negotiationUnit">units</span></small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="negotiationOfferedPrice">Your Offered Price (per unit)</label>
+                            <input type="number" class="form-input" id="negotiationOfferedPrice" 
+                                   placeholder="Enter your offer" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group form-row-full">
+                        <label class="form-label" for="negotiationMessage">Message to Farmer (Optional)</label>
+                        <textarea class="form-input" id="negotiationMessage" rows="3" 
+                                  placeholder="Hi! I'm interested in buying your product. Would you consider my price offer?"></textarea>
+                    </div>
+                    
+                    <div class="price-comparison-preview" id="priceComparisonPreview" style="display: none;">
+                        <span>Potential Total:</span>
+                        <div>
+                            <span id="negotiationTotalPreview">₹0</span>
+                            <span class="savings-preview" id="savingsPreview"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="negotiation-actions">
+                    <button type="button" class="btn-cancel-negotiation" onclick="closeNegotiationModal()">Cancel</button>
+                    <button type="button" class="btn-start-negotiation" id="startNegotiationBtn" onclick="submitNegotiation()">
+                        <span id="negotiationBtnText">Start Chat & Negotiate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order - AgriConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .form-section {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .product-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .price-breakdown {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .price-breakdown.total {
+            font-weight: bold;
+            font-size: 1.1em;
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: 15px;
+        }
+
+        .negotiated-price {
+            background: #d1edff;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Place Your Order</h1>
+            <p>Complete your purchase details</p>
+        </div>
+
+        <div class="form-section">
+            <div id="messageArea"></div>
+
+            <% if (negotiation) { %>
+            <div class="negotiated-price">
+                🎉 Using negotiated price: ₹<%= negotiation.finalPrice %> per <%= product.unit %>
+            </div>
+            <% } %>
+
+            <div class="product-summary">
+                <div class="section-title">📦 Order Summary</div>
+                <h3><%= product.name %></h3>
+                <p><strong>Farmer:</strong> <%= product.farmerName %></p>
+                <p><strong>Category:</strong> <%= product.category %></p>
+                <p><strong>Available:</strong> <%= product.quantity %> <%= product.unit %></p>
+                
+                <div class="price-breakdown">
+                    <span>Price per <%= product.unit %>:</span>
+                    <span>₹<%= currentPrice %></span>
+                </div>
+                <div class="price-breakdown">
+                    <span>Quantity:</span>
+                    <span id="displayQuantity"><%= defaultQuantity %> <%= product.unit %></span>
+                </div>
+                <div class="price-breakdown total">
+                    <span>Total Amount:</span>
+                    <span id="displayTotal">₹<%= (currentPrice * defaultQuantity).toFixed(2) %></span>
+                </div>
+            </div>
+
+            <form id="orderForm">
+                <div class="section-title">👤 Buyer Information</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="buyerName">Full Name *</label>
+                        <input type="text" id="buyerName" name="buyerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerEmail">Email *</label>
+                        <input type="email" id="buyerEmail" name="buyerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerContact">Contact Number *</label>
+                        <input type="tel" id="buyerContact" name="buyerContact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity (<%= product.unit %>) *</label>
+                        <input type="number" id="quantity" name="quantity" min="1" max="<%= product.quantity %>" 
+                               value="<%= defaultQuantity %>" required onchange="updateTotal()">
+                    </div>
+                </div>
+
+                <div class="section-title">📍 Delivery Information</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="street">Street Address *</label>
+                        <input type="text" id="street" name="street" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" name="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State *</label>
+                        <input type="text" id="state" name="state" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode *</label>
+                        <input type="text" id="pincode" name="pincode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="landmark">Landmark</label>
+                        <input type="text" id="landmark" name="landmark">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method *</label>
+                        <select id="paymentMethod" name="paymentMethod" required>
+                            <option value="cash-on-delivery">Cash on Delivery</option>
+                            <option value="online-payment">Online Payment</option>
+                            <option value="bank-transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" rows="4" placeholder="Any special instructions or requirements..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="button" class="btn btn-secondary" onclick="goBack()">← Back</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        🛒 Place Order - ₹<span id="buttonTotal"><%= (currentPrice * defaultQuantity).toFixed(2) %></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const productId = '<%= product._id %>';
+        const pricePerUnit = <%= currentPrice %>;
+        const negotiationId = '<%= negotiationId || "" %>';
+        const maxQuantity = <%= product.quantity %>;
+
+        function updateTotal() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const total = (pricePerUnit * quantity).toFixed(2);
+            
+            document.getElementById('displayQuantity').textContent = `${quantity} <%= product.unit %>`;
+            document.getElementById('displayTotal').textContent = `₹${total}`;
+            document.getElementById('buttonTotal').textContent = total;
+        }
+
+        function showMessage(message, type = 'error') {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</div>`;
+            messageArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Get buyer ID (in real app, from session/auth)
+            const buyerId = localStorage.getItem('userId') || 'demo-buyer-id';
+
+            const orderData = {
+                buyerId: buyerId,
+                buyerName: formData.get('buyerName'),
+                buyerEmail: formData.get('buyerEmail'),
+                buyerContact: formData.get('buyerContact'),
+                productId: productId,
+                quantity: parseInt(formData.get('quantity')),
+                deliveryAddress: {
+                    street: formData.get('street'),
+                    city: formData.get('city'),
+                    state: formData.get('state'),
+                    pincode: formData.get('pincode'),
+                    landmark: formData.get('landmark')
+                },
+                paymentMethod: formData.get('paymentMethod'),
+                notes: formData.get('notes')
+            };
+
+            // Add negotiationId if order is from a negotiation
+            if (negotiationId && negotiationId !== 'null') {
+                orderData.negotiationId = negotiationId;
+            }
+
+            submitBtn.classList.add('loading');
+            submitBtn.textContent = 'Placing Order...';
+
+            try {
+                const response = await fetch('/orders/place', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(`Order placed successfully! Order Number: ${result.orderNumber}`, 'success');
+                    setTimeout(() => {
+                        window.location.href = `/orders/${result.orderId}`;
+                    }, 2000);
+                } else {
+                    showMessage(result.message || 'Failed to place order');
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                showMessage('Network error. Please try again.');
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.innerHTML = `🛒 Place Order - ₹<span id="buttonTotal">${(pricePerUnit * parseInt(document.getElementById('quantity').value)).toFixed(2)}</span>`;
+            }
+        });
+
+        // Auto-fill demo data for testing
+        document.getElementById('buyerName').value = 'John Doe';
+        document.getElementById('buyerEmail').value = 'john.doe@email.com';
+        document.getElementById('buyerContact').value = '9876543210';
+        document.getElementById('street').value = '123 Main Street';
+        document.getElementById('city').value = 'Mumbai';
+        document.getElementById('state').value = 'Maharashtra';
+        document.getElementById('pincode').value = '400001';
+    </script>
+</body>
+</html>

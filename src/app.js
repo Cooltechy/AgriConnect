@@ -8,6 +8,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes')
 const productRoutes = require('./routes/productRoutes')
 const searchRoutes = require('./routes/searchRoutes')
 const orderRoutes = require('./routes/orderRoutes')
+const negotiationRoutes = require('./routes/negotiationRoutes')
 
 const app = express()
 
@@ -42,6 +43,11 @@ app.use(express.urlencoded({ extended: true }))
 const { addUserToLocals } = require('./middleware/auth')
 app.use(addUserToLocals)
 
+// Handle favicon.ico requests
+app.get('/favicon.ico', (req, res) => {
+    res.status(204).end(); // No content
+});
+
 // Routes
 app.use('/', homeRoutes)
 app.use('/', userRoutes)
@@ -49,5 +55,6 @@ app.use('/', dashboardRoutes)
 app.use('/', productRoutes)
 app.use('/', searchRoutes)
 app.use('/orders', orderRoutes)
+app.use('/negotiations', negotiationRoutes)
 
 module.exports = app;

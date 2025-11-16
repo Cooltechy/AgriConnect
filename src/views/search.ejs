@@ -305,6 +305,58 @@
             background: #1c63d5;
         }
 
+        .btn-negotiate {
+            flex: 1;
+            padding: 8px 12px;
+            background: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-negotiate:hover {
+            background: #e64a19;
+        }
+
+        /* Negotiation Price Display */
+        .negotiation-price {
+            display: none;
+            margin-bottom: 8px;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .negotiation-open {
+            background: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ffcc80;
+        }
+
+        .negotiation-accepted {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #81c784;
+        }
+
+        .price-comparison {
+            font-size: 10px;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        .price-comparison.savings {
+            color: #4caf50;
+        }
+
+        .price-comparison.negotiating {
+            color: #ff9800;
+        }
+
         /* Recently Viewed */
         .recently-viewed {
             margin-top: 24px;
@@ -724,6 +776,164 @@
             display: none;
         }
 
+        /* Negotiation Setup Modal Styles */
+        .negotiation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10001;
+            backdrop-filter: blur(4px);
+        }
+
+        .negotiation-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .negotiation-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease;
+            position: relative;
+        }
+
+        .negotiation-modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #ff5722, #f4511e);
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .negotiation-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .negotiation-modal-body {
+            padding: 24px;
+        }
+
+        .product-preview {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border-left: 4px solid #ff5722;
+        }
+
+        .product-preview h3 {
+            color: #ff5722;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .negotiation-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-row-full {
+            grid-column: 1 / -1;
+        }
+
+        .negotiation-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-cancel-negotiation {
+            flex: 1;
+            padding: 14px 24px;
+            background: #f5f5f5;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel-negotiation:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-start-negotiation {
+            flex: 2;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #ff5722, #f4511e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+        }
+
+        .btn-start-negotiation:hover {
+            background: linear-gradient(135deg, #f4511e, #e64a19);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 87, 34, 0.4);
+        }
+
+        .btn-start-negotiation:active {
+            transform: translateY(0);
+        }
+
+        .btn-start-negotiation:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .current-price-info {
+            background: #fff3e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .price-comparison-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f0f8f0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .savings-preview {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .header-container {
@@ -793,6 +1003,38 @@
             .btn-cancel, .btn-place-order {
                 flex: none;
             }
+
+            /* Negotiation Modal Mobile */
+            .negotiation-modal-content {
+                width: 95%;
+                margin: 20px auto;
+                max-height: 85vh;
+            }
+
+            .negotiation-modal-header {
+                padding: 20px 16px 12px;
+            }
+
+            .negotiation-modal-title {
+                font-size: 18px;
+            }
+
+            .negotiation-modal-body {
+                padding: 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .negotiation-actions {
+                flex-direction: column;
+            }
+
+            .btn-cancel-negotiation, .btn-start-negotiation {
+                flex: none;
+            }
         }
 
         /* Product emojis for categories */
@@ -833,6 +1075,7 @@
             <div class="nav-links">
                 <a href="/search?userId=<%= user._id %>">Home</a>
                 <a href="/client-dashboard?userId=<%= user._id %>">Dashboard</a>
+                <a href="/negotiations/buyer-history?userId=<%= user._id %>">My Negotiations</a>
                 <a href="/orders/history?userId=<%= user._id %>">Orders</a>
                 <a href="/">Logout</a>
             </div>
@@ -1057,6 +1300,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadProducts();
             displayRecentlyViewed();
+            loadUserNegotiations();
             
             // Set up search form
             document.getElementById('searchForm').addEventListener('submit', handleSearch);
@@ -1150,6 +1394,9 @@
             
             container.innerHTML = products.map(product => createProductCard(product)).join('');
             container.style.display = 'grid';
+            
+            // Display negotiation prices after DOM update
+            setTimeout(() => displayNegotiationPrices(), 100);
         }
 
         function displayTopRated() {
@@ -1164,6 +1411,9 @@
                 .slice(0, 6);
             
             container.innerHTML = products.map(product => createProductCard(product)).join('');
+            
+            // Display negotiation prices after DOM update
+            setTimeout(() => displayNegotiationPrices(), 100);
         }
 
         function displayTrending() {
@@ -1174,6 +1424,9 @@
                 .slice(0, 6);
             
             container.innerHTML = products.map(product => createProductCard(product)).join('');
+            
+            // Display negotiation prices after DOM update
+            setTimeout(() => displayNegotiationPrices(), 100);
         }
 
         function displaySearchResults(query) {
@@ -1207,8 +1460,11 @@
                     <div class="product-unit">per ${product.unit}</div>
                     <div class="product-farmer">By ${product.farmerName}</div>
 
+                    <div class="negotiation-price" id="negotiation-${product._id}"></div>
+                    
                     <div class="product-actions" onclick="event.stopPropagation()">
                         <a href="tel:${product.farmerContact}" class="btn-contact">Contact</a>
+                        <button class="btn-negotiate" onclick="negotiatePrice('${product._id}', ${product.price}, '${product.unit}')">💬 Negotiate</button>
                         <button class="btn-order" onclick="orderProduct('${product._id}')">Order</button>
                     </div>
                 </div>
@@ -1429,6 +1685,261 @@
             }
         }
 
+        // Negotiation Functions
+        let currentNegotiationProduct = null;
+        
+        function negotiatePrice(productId, currentPrice, unit) {
+            // Check if there's already an active negotiation for this product
+            const userNegotiations = window.userNegotiations || [];
+            const existingNegotiation = userNegotiations.find(n => n.productId._id === productId && n.status === 'open');
+            
+            if (existingNegotiation) {
+                if (confirm('You already have an active negotiation for this product. Would you like to continue the existing chat?')) {
+                    window.location.href = `/negotiations/${existingNegotiation._id}/chat?userId=${window.currentUser._id}&userType=buyer`;
+                    return;
+                } else {
+                    return;
+                }
+            }
+            
+            // Find the product in allProducts array
+            const product = allProducts.find(p => p._id === productId);
+            if (!product) {
+                alert('Product not found. Please refresh the page.');
+                return;
+            }
+            
+            // Show negotiation setup modal
+            showNegotiationModal(product);
+        }
+        
+        function showNegotiationModal(product) {
+            currentNegotiationProduct = product;
+            
+            // Populate modal with product information
+            document.getElementById('negotiationProductName').textContent = product.name;
+            document.getElementById('negotiationCurrentPrice').textContent = `₹${product.price}/${product.unit}`;
+            document.getElementById('negotiationProductCategory').textContent = product.category;
+            document.getElementById('negotiationAvailable').textContent = product.quantity;
+            document.getElementById('negotiationUnit').textContent = product.unit;
+            
+            // Reset form
+            document.getElementById('negotiationQuantity').value = 1;
+            document.getElementById('negotiationQuantity').max = product.quantity;
+            document.getElementById('negotiationOfferedPrice').value = '';
+            document.getElementById('negotiationOfferedPrice').placeholder = `Enter offer (current: ${product.price})`;
+            document.getElementById('negotiationMessage').value = `Hi! I'm interested in buying your ${product.name}. Would you consider my price offer?`;
+            
+            // Hide messages and comparison
+            document.getElementById('negotiationSuccessMessage').style.display = 'none';
+            document.getElementById('negotiationErrorMessage').style.display = 'none';
+            document.getElementById('priceComparisonPreview').style.display = 'none';
+            
+            // Show modal
+            document.getElementById('negotiationModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeNegotiationModal() {
+            document.getElementById('negotiationModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+            currentNegotiationProduct = null;
+        }
+        
+        // Update price comparison when inputs change
+        function updatePriceComparison() {
+            if (!currentNegotiationProduct) return;
+            
+            const quantity = parseInt(document.getElementById('negotiationQuantity').value) || 0;
+            const offeredPrice = parseFloat(document.getElementById('negotiationOfferedPrice').value) || 0;
+            
+            if (quantity > 0 && offeredPrice > 0) {
+                const currentTotal = quantity * currentNegotiationProduct.price;
+                const offeredTotal = quantity * offeredPrice;
+                const savings = currentTotal - offeredTotal;
+                
+                document.getElementById('negotiationTotalPreview').textContent = `₹${offeredTotal.toLocaleString()}`;
+                
+                if (savings > 0) {
+                    document.getElementById('savingsPreview').textContent = `(Save ₹${savings.toLocaleString()})`;
+                    document.getElementById('savingsPreview').style.color = '#4caf50';
+                } else if (savings < 0) {
+                    document.getElementById('savingsPreview').textContent = `(₹${Math.abs(savings).toLocaleString()} more)`;
+                    document.getElementById('savingsPreview').style.color = '#f44336';
+                } else {
+                    document.getElementById('savingsPreview').textContent = '(Same price)';
+                    document.getElementById('savingsPreview').style.color = '#666';
+                }
+                
+                document.getElementById('priceComparisonPreview').style.display = 'flex';
+            } else {
+                document.getElementById('priceComparisonPreview').style.display = 'none';
+            }
+        }
+        
+        // Display negotiation prices
+        function displayNegotiationPrices() {
+            if (!window.userNegotiations) return;
+            
+            const negotiations = window.userNegotiations;
+            
+            negotiations.forEach(negotiation => {
+                const productId = negotiation.productId._id;
+                const negotiationElement = document.getElementById(`negotiation-${productId}`);
+                
+                if (negotiationElement) {
+                    const originalPrice = negotiation.productId.price;
+                    const negotiatedPrice = negotiation.finalPrice || negotiation.initialPrice;
+                    const status = negotiation.status;
+                    
+                    let html = '';
+                    let className = '';
+                    
+                    if (status === 'open') {
+                        className = 'negotiation-open';
+                        html = `💬 Negotiating: ₹${negotiatedPrice}/${negotiation.unit}`;
+                        
+                        if (negotiatedPrice < originalPrice) {
+                            const savings = originalPrice - negotiatedPrice;
+                            html += `<div class="price-comparison negotiating">Potential savings: ₹${savings}/${negotiation.unit}</div>`;
+                        }
+                    } else if (status === 'accepted') {
+                        className = 'negotiation-accepted';
+                        html = `✅ Agreed: ₹${negotiatedPrice}/${negotiation.unit}`;
+                        
+                        if (negotiatedPrice < originalPrice) {
+                            const savings = originalPrice - negotiatedPrice;
+                            html += `<div class="price-comparison savings">You saved: ₹${savings}/${negotiation.unit}</div>`;
+                        }
+                    }
+                    
+                    negotiationElement.className = `negotiation-price ${className}`;
+                    negotiationElement.innerHTML = html;
+                    negotiationElement.style.display = 'block';
+                    
+                    // Add click handler to open negotiation chat
+                    negotiationElement.style.cursor = 'pointer';
+                    negotiationElement.onclick = function() {
+                        window.location.href = `/negotiations/${negotiation._id}/chat?userId=${window.currentUser._id}&userType=buyer`;
+                    };
+                }
+            });
+        }
+        
+        // Submit negotiation
+        async function submitNegotiation() {
+            if (!currentNegotiationProduct) return;
+            
+            const quantity = parseInt(document.getElementById('negotiationQuantity').value);
+            const offeredPrice = parseFloat(document.getElementById('negotiationOfferedPrice').value);
+            const message = document.getElementById('negotiationMessage').value.trim();
+            
+            // Validate inputs
+            if (!quantity || quantity <= 0 || quantity > currentNegotiationProduct.quantity) {
+                showNegotiationMessage('Please enter a valid quantity.', true);
+                return;
+            }
+            
+            if (!offeredPrice || offeredPrice <= 0) {
+                showNegotiationMessage('Please enter a valid price offer.', true);
+                return;
+            }
+            
+            // Show loading state
+            const btn = document.getElementById('startNegotiationBtn');
+            const btnText = document.getElementById('negotiationBtnText');
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span>Creating negotiation...';
+            
+            try {
+                const response = await fetch('/negotiations/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        buyerId: window.currentUser._id,
+                        productId: currentNegotiationProduct._id,
+                        quantity: quantity,
+                        offeredPrice: offeredPrice,
+                        message: message || null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                // Reset button state
+                btn.disabled = false;
+                btnText.textContent = 'Start Chat & Negotiate';
+                
+                if (result.success) {
+                    showNegotiationMessage('✅ Negotiation created! Redirecting to chat...', false);
+                    
+                    // Redirect to chat after a short delay
+                    setTimeout(() => {
+                        window.location.href = `/negotiations/${result.negotiationId}/chat?userId=${window.currentUser._id}&userType=buyer`;
+                    }, 1500);
+                } else {
+                    showNegotiationMessage(`❌ Failed to start negotiation: ${result.message || 'Unknown error'}`, true);
+                }
+                
+            } catch (error) {
+                console.error('Error creating negotiation:', error);
+                
+                // Reset button state
+                btn.disabled = false;
+                btnText.textContent = 'Start Chat & Negotiate';
+                
+                showNegotiationMessage('❌ Network error. Please try again.', true);
+            }
+        }
+        
+        function showNegotiationMessage(message, isError = false) {
+            const successDiv = document.getElementById('negotiationSuccessMessage');
+            const errorDiv = document.getElementById('negotiationErrorMessage');
+            
+            if (isError) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+            } else {
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+                errorDiv.style.display = 'none';
+            }
+        }
+        
+        // Load user negotiations
+        async function loadUserNegotiations() {
+            try {
+                const response = await fetch(`/negotiations/buyer/${window.currentUser._id}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.userNegotiations = data.negotiations;
+                    displayNegotiationPrices();
+                }
+            } catch (error) {
+                console.error('Error loading negotiations:', error);
+            }
+        }
+        
+        // Add event listeners for real-time price comparison
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add input event listeners after DOM is loaded
+            setTimeout(() => {
+                const quantityInput = document.getElementById('negotiationQuantity');
+                const priceInput = document.getElementById('negotiationOfferedPrice');
+                
+                if (quantityInput) {
+                    quantityInput.addEventListener('input', updatePriceComparison);
+                }
+                if (priceInput) {
+                    priceInput.addEventListener('input', updatePriceComparison);
+                }
+            }, 100);
+        });
+
         // Click outside modal to close
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('orderModal');
@@ -1511,4 +2022,89 @@
         }
     </script>
 </body>
+</html>    <!-- Negotiation Setup Modal -->
+    <div class="negotiation-modal" id="negotiationModal">
+        <div class="negotiation-modal-content">
+            <div class="negotiation-modal-header">
+                <h2 class="negotiation-modal-title">💬 Start Price Negotiation</h2>
+                <button class="close-modal" onclick="closeNegotiationModal()">&times;</button>
+            </div>
+            
+            <div class="negotiation-modal-body">
+                <div class="success-message" id="negotiationSuccessMessage" style="display: none;"></div>
+                <div class="error-message" id="negotiationErrorMessage" style="display: none;"></div>
+                
+                <!-- Product Preview -->
+                <div class="product-preview">
+                    <h3 id="negotiationProductName">Product Name</h3>
+                    <div class="current-price-info">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span>Current Price:</span>
+                            <span style="font-weight: bold; font-size: 18px;" id="negotiationCurrentPrice">₹0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Category:</span>
+                            <span id="negotiationProductCategory">Category</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Negotiation Form -->
+                <div class="negotiation-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="negotiationQuantity">Quantity Needed</label>
+                            <input type="number" class="form-input" id="negotiationQuantity" 
+                                   placeholder="Enter quantity" min="1" value="1" required>
+                            <small style="color: #666; font-size: 12px;">Available: <span id="negotiationAvailable">0</span> <span id="negotiationUnit">units</span></small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="negotiationOfferedPrice">Your Offered Price (per unit)</label>
+                            <input type="number" class="form-input" id="negotiationOfferedPrice" 
+                                   placeholder="Enter your offer" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group form-row-full">
+                        <label class="form-label" for="negotiationMessage">Message to Farmer (Optional)</label>
+                        <textarea class="form-input" id="negotiationMessage" rows="3" 
+                                  placeholder="Hi! I'm interested in buying your product. Would you consider my price offer?"></textarea>
+                    </div>
+                    
+                    <div class="price-comparison-preview" id="priceComparisonPreview" style="display: none;">
+                        <span>Potential Total:</span>
+                        <div>
+                            <span id="negotiationTotalPreview">₹0</span>
+                            <span class="savings-preview" id="savingsPreview"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="negotiation-actions">
+                    <button type="button" class="btn-cancel-negotiation" onclick="closeNegotiationModal()">Cancel</button>
+                    <button type="button" class="btn-start-negotiation" id="startNegotiationBtn" onclick="submitNegotiation()">
+                        <span id="negotiationBtnText">Start Chat & Negotiate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+         < ! - -   N e g o t i a t i o n   S e t u p   M o d a l   - - > 
+ 
+         < d i v   c l a s s = " n e g o t i a t i o n - m o d a l "   i d = " n e g o t i a t i o n M o d a l " > 
+ 
+ 
+    <!-- Negotiation Setup Modal -->
+    <div class="negotiation-modal" id="negotiationModal">
+        <div class="negotiation-modal-content">
+            <div class="negotiation-modal-header">
+                <h2 class="negotiation-modal-title"> Start Price Negotiation</h2>
+                <button class="close-modal" onclick="closeNegotiationModal()">&times;</button>
+            </div>
+        </div>
+    </div>
+
 </html>

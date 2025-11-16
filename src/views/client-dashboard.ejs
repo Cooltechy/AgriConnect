@@ -402,6 +402,7 @@
                 <a href="/products">Browse Products</a>
                 <a href="/client-dashboard">Dashboard</a>
                 <a href="/orders/history">My Orders</a>
+                <a href="/negotiations/buyer-history?userId=<%= user._id %>">My Negotiations</a>
                 <span style="color: rgba(255,255,255,0.8); margin: 0 10px;">|</span>
                 <span style="color: rgba(255,255,255,0.9); padding: 8px 12px;">
                     👤 <%= user.name || 'User' %>
@@ -553,6 +554,41 @@
                 </div>
             <% } %>
         </div> -->
+
+        <!-- My Negotiations Section -->
+        <div class="negotiations-section" style="background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #1976D2; margin: 0;">💬 My Price Negotiations</h2>
+                <a href="/products?userId=<%= user._id %>" style="color: #2196F3; text-decoration: none; font-weight: 500;">Browse Products →</a>
+            </div>
+            
+            <div class="negotiation-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #1976D2;">0</div>
+                    <div style="color: #666; font-size: 0.9em;">Active Negotiations</div>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #4CAF50;">0</div>
+                    <div style="color: #666; font-size: 0.9em;">Successful Deals</div>
+                </div>
+                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #FF9800;">₹0</div>
+                    <div style="color: #666; font-size: 0.9em;">Money Saved</div>
+                </div>
+            </div>
+            
+            <div class="recent-negotiations">
+                <h3 style="margin-bottom: 15px; color: #333;">Recent Negotiations</h3>
+                <div id="negotiationsContainer">
+                    <div style="text-align: center; padding: 30px; background: #f8f9fa; border-radius: 10px; color: #666;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">💬</div>
+                        <p>No active negotiations yet!</p>
+                        <p style="font-size: 0.9em; margin-top: 5px;">Start negotiating prices with farmers to get better deals.</p>
+                        <a href="/products?userId=<%= user._id %>" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #2196F3; color: white; text-decoration: none; border-radius: 20px; font-size: 0.9em;">Start Negotiating</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Order Management Section -->
         <div class="orders-section" style="margin: 40px 0;">
@@ -782,6 +818,115 @@
                 });
             }
         }
+        
+        // Load negotiations for client
+        function loadClientNegotiations() {
+            const container = document.getElementById('negotiationsContainer');
+            
+            fetch(`/negotiations/api/buyer/<%= user._id %>`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.negotiations.length > 0) {
+                        displayClientNegotiations(data.negotiations);
+                        updateNegotiationStats(data.negotiations);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading negotiations:', error);
+                });
+        }
+        
+        function displayClientNegotiations(negotiations) {
+            const container = document.getElementById('negotiationsContainer');
+            const html = negotiations.map(neg => `
+                <div style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid ${getStatusColor(neg.status)};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div>
+                            <strong style="color: #1976D2;">${neg.productId.name}</strong>
+                            <div style="color: #666; font-size: 0.9em;">with ${neg.farmerId.name}</div>
+                        </div>
+                        <div style="padding: 4px 12px; border-radius: 20px; font-size: 0.8em; background: ${getStatusBg(neg.status)}; color: ${getStatusColor(neg.status)};">
+                            ${neg.status.charAt(0).toUpperCase() + neg.status.slice(1)}
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span>Quantity: ${neg.quantity} ${neg.unit}</span>
+                        <span>Price: ₹${neg.finalPrice || neg.initialPrice}</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="/negotiations/${neg._id}/chat?userId=<%= user._id %>&userType=buyer" 
+                           style="flex: 1; padding: 8px 12px; background: #2196F3; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-size: 0.9em;">
+                            💬 Open Chat
+                        </a>
+                        ${neg.status === 'accepted' ? `
+                            <a href="/place-order?productId=${neg.productId._id}&negotiationId=${neg._id}&quantity=${neg.quantity}" 
+                               style="flex: 1; padding: 8px 12px; background: #4CAF50; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-size: 0.9em;">
+                                🛒 Place Order
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        function updateNegotiationStats(negotiations) {
+            const active = negotiations.filter(n => n.status === 'open').length;
+            const successful = negotiations.filter(n => n.status === 'accepted').length;
+            const savings = negotiations
+                .filter(n => n.status === 'accepted' && n.finalPrice < n.productId.price)
+                .reduce((sum, n) => sum + ((n.productId.price - n.finalPrice) * n.quantity), 0);
+            
+            // Update stats in the negotiation section
+            const statsContainer = document.querySelector('.negotiation-stats');
+            if (statsContainer) {
+                statsContainer.innerHTML = `
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.5em; font-weight: bold; color: #1976D2;">${active}</div>
+                        <div style="color: #666; font-size: 0.9em;">Active Negotiations</div>
+                    </div>
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.5em; font-weight: bold; color: #4CAF50;">${successful}</div>
+                        <div style="color: #666; font-size: 0.9em;">Successful Deals</div>
+                    </div>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.5em; font-weight: bold; color: #FF9800;">₹${savings}</div>
+                        <div style="color: #666; font-size: 0.9em;">Money Saved</div>
+                    </div>
+                `;
+            }
+        }
+        
+        function getStatusColor(status) {
+            switch(status) {
+                case 'open': return '#1976D2';
+                case 'accepted': return '#4CAF50';
+                case 'rejected': return '#f44336';
+                case 'finalized': return '#9C27B0';
+                default: return '#666';
+            }
+        }
+        
+        function getStatusBg(status) {
+            switch(status) {
+                case 'open': return '#e3f2fd';
+                case 'accepted': return '#e8f5e8';
+                case 'rejected': return '#ffebee';
+                case 'finalized': return '#f3e5f5';
+                default: return '#f5f5f5';
+            }
+        }
+        
+        // Load negotiations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadClientNegotiations();
+            
+            // Set user ID for negotiation functionality
+            if (!localStorage.getItem('userId')) {
+                localStorage.setItem('userId', '<%= user._id %>');
+            }
+        });
     </script>
 </body>
 </html>
