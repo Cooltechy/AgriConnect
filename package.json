@@ -1,7 +1,7 @@
 {
-  "name": "farmermarketplace",
+  "name": "farmconnect",
   "version": "1.0.0",
-  "description": "Agricultural marketplace connecting farmers with clients",
+  "description": "FarmConnect - Agricultural platform connecting farmers with clients",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
